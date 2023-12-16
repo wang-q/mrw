@@ -39,12 +39,12 @@ For testing:
 * Alert. `hyper` + `W`
 * Notify. `hyperShift` + `W`
 
-## Windows - AutoHotkey
+## Windows - AutoHotkey v1
 
 ### Installation
 
-[Download here](https://www.autohotkey.com/) or `winget install -s msstore --accept-package-agreements "AutoHotkey Store Edition"`.
-
+[Download here](https://www.autohotkey.com/) or
+`winget install -s msstore --accept-package-agreements "AutoHotkey Store Edition"`.
 
 ## Ideas
 
