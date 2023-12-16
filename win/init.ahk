@@ -322,12 +322,12 @@ MoveToEdge(Edge) {
 CalculateSizeByWinRatio(ByRef NewW, ByRef NewH, WinNum, Ratio) {
     WinNum := GetWindowNumber()
     SysGet, Mon, MonitorWorkArea, %WinNum%
+    NewW := (MonRight - MonLeft) * Ratio
     NewH := (MonBottom - MonTop) * Ratio
-    NewW := Floor(NewH * 4 / 3)
 }
 
 ResizeAndCenter(Ratio) {
     WinNum := GetWindowNumber()
-    CalculateSizeByWinRatio(NewW, NewH, WinNum, Ratio)
+    CalculateSizeByWinRatioShift(NewW, NewH, WinNum, Ratio)
     DoResizeAndCenter(WinNum, NewW, NewH)
 }
