@@ -39,14 +39,17 @@ For testing:
 * Alert. `hyper` + `W`
 * Notify. `hyperShift` + `W`
 
-### Ideas
-
-Come from [this post](http://songchenwen.com/tech/2015/04/02/hammerspoon-mac-window-manager/).
-
-Size looping like [spectacle](https://www.spectacleapp.com).
-
 ## Windows - AutoHotkey
 
 ### Installation
 
-[Download here](https://www.autohotkey.com/) or `winget install --id AutoHotkey.AutoHotkey -e`.
+[Download here](https://www.autohotkey.com/) or `winget install -s msstore --accept-package-agreements "AutoHotkey Store Edition"`.
+
+
+## Ideas
+
+Hammerspoon section comes from [this post](http://songchenwen.com/tech/2015/04/02/hammerspoon-mac-window-manager/).
+
+Size looping like [spectacle](https://www.spectacleapp.com).
+
+AHK section comes from [here](https://github.com/justcla/WindowHotKeys).
