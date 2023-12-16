@@ -328,6 +328,6 @@ CalculateSizeByWinRatio(ByRef NewW, ByRef NewH, WinNum, Ratio) {
 
 ResizeAndCenter(Ratio) {
     WinNum := GetWindowNumber()
-    CalculateSizeByWinRatioShift(NewW, NewH, WinNum, Ratio)
+    CalculateSizeByWinRatio(NewW, NewH, WinNum, Ratio)
     DoResizeAndCenter(WinNum, NewW, NewH)
 }
