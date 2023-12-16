@@ -85,6 +85,23 @@ return
     ToHS("Bottom")
 return
 
+; Move
+#!^Home::
+    MoveToEdge("Left")
+return
+
+#!^End::
+    MoveToEdge("Right")
+return
+
+#!^PgUp::
+    MoveToEdge("Top")
+return
+
+#!^PgDn::
+    MoveToEdge("Bottom")
+return
+
 ; Center window
 #!^+C::
     MoveWindowToCenter()
