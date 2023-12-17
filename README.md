@@ -1,5 +1,7 @@
 # Resize windows on macOS/Windows
 
+## Usage
+
 |        Symbol         |                       Key                        |
 |:---------------------:|:------------------------------------------------:|
 |   <kbd>hyper</kbd>    | <kbd>ctrl</kbd> +<kbd>opt</kbd> + <kbd>cmd</kbd> |
@@ -29,8 +31,6 @@ For testing:
 
 ## macOS - Hammerspoon
 
-### Installation
-
 [Download here](https://www.hammerspoon.org) or `brew install hammerspoon`.
 
 Then symlink the configuration file:
@@ -41,8 +41,6 @@ bash mac/install.sh
 ```
 
 ## Windows - AutoHotkey v1
-
-### Installation
 
 [Download here](https://www.autohotkey.com/) or
 `winget install -s msstore --accept-package-agreements "AutoHotkey Store Edition"`.
