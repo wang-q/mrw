@@ -45,6 +45,8 @@ bash mac/install.sh
 [Download here](https://www.autohotkey.com/) or
 `winget install -s msstore --accept-package-agreements "AutoHotkey Store Edition"`.
 
+If you want the program to start automatically at startup, see [here](https://hackmd.io/@xwater8/r1G5e7RXL).
+
 ## Ideas
 
 Hammerspoon section comes
