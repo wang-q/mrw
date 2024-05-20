@@ -47,6 +47,18 @@ bash mac/install.sh
 
 If you want the program to start automatically at startup, see [here](https://hackmd.io/@xwater8/r1G5e7RXL).
 
+Or run the following codes:
+
+```powershell
+$WshShell = New-Object -comObject WScript.Shell
+$Shortcut = $WshShell.CreateShortcut("$ENV:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\rw.lnk")
+$Shortcut.TargetPath = "$Home\Scripts\rw\win\init.ahk"
+$Shortcut.Save()
+
+# start "$ENV:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup"
+
+```
+
 ## Ideas
 
 Hammerspoon section comes
