@@ -59,6 +59,13 @@ $Shortcut.Save()
 
 ```
 
+[officekey](https://superuser.com/questions/1455857/how-to-disable-office-key-keyboard-shortcut-opening-office-app)
+
+```cmd
+REG ADD HKCU\Software\Classes\ms-officeapp\Shell\Open\Command /t REG_SZ /d rundll32
+
+```
+
 ## Ideas
 
 Hammerspoon section comes
