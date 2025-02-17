@@ -2,7 +2,14 @@
 local hyper = { "ctrl", "alt", "cmd" }
 local hyperShift = { "ctrl", "alt", "cmd", "shift" }
 
+-- screen ratios
+local WIDTH_RATIOS = { 0.75, 0.6, 0.5, 0.4, 0.25 }
+local HEIGHT_RATIOS = { 0.75, 0.5, 0.25 }
+local BASE_RATIOS = { 1.0, 0.9, 0.7, 0.5 }
+
+-- ------
 -- window management utilities
+-- ------
 local function getWindowFrame()
     local win = hs.window.focusedWindow()
     if not win then return nil end
@@ -13,12 +20,58 @@ local function setWindowFrame(win, f)
     if win then win:setFrame(f) end
 end
 
--- screen ratios
-local WIDTH_RATIOS = { 0.75, 0.6, 0.5, 0.4, 0.25 }
-local HEIGHT_RATIOS = { 0.75, 0.5, 0.25 }
-local BASE_RATIOS = { 1.0, 0.9, 0.7, 0.5 }
+local function cycleRatios(f, max, ratios, isWidth, alignRight)
+    local size = isWidth and f.w or f.h
+    local maxSize = isWidth and max.w or max.h
+    
+    for i, ratio in ipairs(ratios) do
+        if size == math.floor(maxSize * ratio) then
+            local nextRatio = ratios[i + 1] or ratios[1]
+            if isWidth then
+                f.w = math.floor(maxSize * nextRatio)
+                f.x = alignRight and (max.x + math.floor(max.w * (1 - nextRatio))) or max.x
+            else
+                f.h = math.floor(maxSize * nextRatio)
+                f.y = alignRight and (max.y + (max.h - f.h)) or max.y
+            end
+            return true
+        end
+    end
+    
+    if isWidth then
+        f.w = math.floor(maxSize * ratios[1])
+        f.x = alignRight and (max.x + math.floor(max.w * (1 - ratios[1]))) or max.x
+    else
+        f.h = math.floor(maxSize * ratios[1])
+        f.y = alignRight and (max.y + (max.h - f.h)) or max.y
+    end
+    return true
+end
 
+local function cycle43Window(f, max)
+    local basew = math.floor(max.h * 4 / 3)
+    local baseh = max.h
+    
+    f.x = max.x
+    f.y = max.y
+
+    for i, ratio in ipairs(BASE_RATIOS) do
+        if f.w == math.floor(basew * ratio) then
+            local nextRatio = BASE_RATIOS[i + 1] or BASE_RATIOS[1]
+            f.w = math.floor(basew * nextRatio)
+            f.h = math.floor(baseh * nextRatio)
+            return true
+        end
+    end
+    
+    f.w = math.floor(basew * BASE_RATIOS[1])
+    f.h = math.floor(baseh * BASE_RATIOS[1])
+    return true
+end
+
+-- ------
 -- hello world
+-- ------
 hs.hotkey.bind(hyper, "W", function()
     hs.alert.show("Hello World!")
 end)
@@ -27,7 +80,9 @@ hs.hotkey.bind(hyperShift, "W", function()
     hs.notify.new({ title = "Hammerspoon", informativeText = "Hello World" }):send()
 end)
 
+-- ------
 -- Move to another screen
+-- ------
 hs.hotkey.bind(hyper, "J", function()
     local win = hs.window.focusedWindow()
     if win then win:moveToScreen(win:screen():toEast()) end
@@ -39,10 +94,9 @@ hs.hotkey.bind(hyper, "K", function()
 end)
 
 -- ------
--- Move Window
+-- Half screen
 -- ------
-
--- vertical half screen
+-- vertical 
 hs.hotkey.bind(hyperShift, "Left", function()
     local win, f, max = getWindowFrame()
     if not win then return end
@@ -65,201 +119,130 @@ hs.hotkey.bind(hyperShift, "Right", function()
     setWindowFrame(win, f)
 end)
 
--- loop 3/4, 3/5, 1/2, 2/5, 1/4 screen width
-
--- loop width ratios
-hs.hotkey.bind(hyper, "Left", function()
-    local win = hs.window.focusedWindow()
-    local f = win:frame()
-    local screen = win:screen()
-    local max = screen:frame()
-
-    local serials = WIDTH_RATIOS
-
-    if f.w == math.floor(max.w * serials[1]) then
-        f.w = math.floor(max.w * serials[2])
-        f.x = max.x
-    elseif f.w == math.floor(max.w * serials[2]) then
-        f.w = math.floor(max.w * serials[3])
-        f.x = max.x
-    elseif f.w == math.floor(max.w * serials[3]) then
-        f.w = math.floor(max.w * serials[4])
-        f.x = max.x
-    elseif f.w == math.floor(max.w * serials[4]) then
-        f.w = math.floor(max.w * serials[5])
-        f.x = max.x
-    elseif f.w == math.floor(max.w * serials[5]) then
-        f.w = math.floor(max.w * serials[1])
-        f.x = max.x
-    else
-        f.w = math.floor(max.w * serials[1])
-        f.x = max.x
-    end
-
-    win:setFrame(f)
-end)
-
-hs.hotkey.bind(hyper, "Right", function()
-    local win = hs.window.focusedWindow()
-    local f = win:frame()
-    local screen = win:screen()
-    local max = screen:frame()
-
-    local serials = { 0.75, 0.6, 0.5, 0.4, 0.25 }
-
-    if f.w == math.floor(max.w * serials[1]) then
-        f.w = math.floor(max.w * serials[2])
-        f.x = max.x + math.floor(max.w * (1 - serials[2]))
-    elseif f.w == math.floor(max.w * serials[2]) then
-        f.w = math.floor(max.w * serials[3])
-        f.x = max.x + math.floor(max.w * (1 - serials[3]))
-    elseif f.w == math.floor(max.w * serials[3]) then
-        f.w = math.floor(max.w * serials[4])
-        f.x = max.x + math.floor(max.w * (1 - serials[4]))
-    elseif f.w == math.floor(max.w * serials[4]) then
-        f.w = math.floor(max.w * serials[5])
-        f.x = max.x + math.floor(max.w * (1 - serials[5]))
-    elseif f.w == math.floor(max.w * serials[5]) then
-        f.w = math.floor(max.w * serials[1])
-        f.x = max.x + math.floor(max.w * (1 - serials[1]))
-    else
-        f.w = math.floor(max.w * serials[1])
-        f.x = max.x + math.floor(max.w * (1 - serials[1]))
-    end
-
-    win:setFrame(f)
-end)
-
--- horizonal half screen
+-- horizonal
 hs.hotkey.bind(hyperShift, "Up", function()
-    local win = hs.window.focusedWindow()
-    local f = win:frame()
-    local screen = win:screen()
-    local max = screen:frame()
+    local win, f, max = getWindowFrame()
+    if not win then return end
 
     f.x = max.x
     f.y = max.y
     f.w = max.w
     f.h = max.h / 2
-    win:setFrame(f)
+    setWindowFrame(win, f)
 end)
 
 hs.hotkey.bind(hyperShift, "Down", function()
-    local win = hs.window.focusedWindow()
-    local f = win:frame()
-    local screen = win:screen()
-    local max = screen:frame()
+    local win, f, max = getWindowFrame()
+    if not win then return end
 
     f.x = max.x
     f.y = max.y + (max.h - f.h)
     f.w = max.w
     f.h = max.h / 2
-    win:setFrame(f)
+    setWindowFrame(win, f)
 end)
 
--- loop 3/4, 1/2, 1/4 screen height
+-- ------
+-- Loops
+-- ------
+-- loop width ratios
+hs.hotkey.bind(hyper, "Left", function()
+    local win, f, max = getWindowFrame()
+    if not win then return end
+    cycleRatios(f, max, WIDTH_RATIOS, true, false)
+    setWindowFrame(win, f)
+end)
+
+hs.hotkey.bind(hyper, "Right", function()
+    local win, f, max = getWindowFrame()
+    if not win then return end
+    cycleRatios(f, max, WIDTH_RATIOS, true, true)
+    setWindowFrame(win, f)
+end)
+
+-- loop height ratios
 hs.hotkey.bind(hyper, "Up", function()
-    local win = hs.window.focusedWindow()
-    local f = win:frame()
-    local screen = win:screen()
-    local max = screen:frame()
-
-    if f.h == math.floor(max.h / 4 * 3) then
-        f.h = math.floor(max.h / 2)
-        f.y = max.y
-    elseif f.h == math.floor(max.h / 2) then
-        f.h = math.floor(max.h / 4)
-        f.y = max.y
-    elseif math.floor(max.h / 4) then
-        f.h = math.floor(max.h / 4 * 3)
-        f.y = max.y
-    else
-        f.h = math.floor(max.h / 4 * 3)
-        f.y = max.y
-    end
-
-    win:setFrame(f)
+    local win, f, max = getWindowFrame()
+    if not win then return end
+    cycleRatios(f, max, HEIGHT_RATIOS, false, false)
+    setWindowFrame(win, f)
 end)
 
 hs.hotkey.bind(hyper, "Down", function()
-    local win = hs.window.focusedWindow()
-    local f = win:frame()
-    local screen = win:screen()
-    local max = screen:frame()
-
-    if f.h == math.floor(max.h / 4 * 3) then
-        f.h = math.floor(max.h / 2)
-        f.y = max.y + (max.h - f.h)
-    elseif f.h == math.floor(max.h / 2) then
-        f.h = math.floor(max.h / 4)
-        f.y = max.y + (max.h - f.h)
-    elseif math.floor(max.h / 4) then
-        f.h = math.floor(max.h / 4 * 3)
-        f.y = max.y + (max.h - f.h)
-    else
-        f.h = math.floor(max.h / 4 * 3)
-        f.y = max.y + (max.h - f.h)
-    end
-
-    win:setFrame(f)
+    local win, f, max = getWindowFrame()
+    if not win then return end
+    cycleRatios(f, max, HEIGHT_RATIOS, false, true)
+    setWindowFrame(win, f)
 end)
 
+-- ------
 -- Maximize window
+-- ------
 hs.hotkey.bind(hyperShift, "M", function()
-    local win = hs.window.focusedWindow()
-    local f = win:frame()
-    local screen = win:screen()
-    local max = screen:frame()
+    local win, f, max = getWindowFrame()
+    if not win then return end
 
     f.x = max.x
     f.y = max.y
     f.w = max.w
     f.h = max.h
-    win:setFrame(f)
+    setWindowFrame(win, f)
 end)
 
 hs.hotkey.bind(hyper, "M", function()
-    local win = hs.window.focusedWindow()
-    local f = win:frame()
-    local screen = win:screen()
-    local max = screen:frame()
-
-    -- 4:3 window
-    local basew = math.floor(max.h * 4 / 3)
-    local baseh = max.h
-    local serials = { 1, 0.9, 0.7, 0.5 }
-
-    f.x = max.x
-    f.y = max.y
-
-    if f.w == math.floor(basew * serials[1]) then
-        f.w = math.floor(basew * serials[2])
-        f.h = math.floor(baseh * serials[2])
-    elseif f.w == math.floor(basew * serials[2]) then
-        f.w = math.floor(basew * serials[3])
-        f.h = math.floor(baseh * serials[3])
-    elseif f.w == math.floor(basew * serials[3]) then
-        f.w = math.floor(basew * serials[4])
-        f.h = math.floor(baseh * serials[4])
-    elseif f.w == math.floor(basew * serials[4]) then
-        f.w = math.floor(basew * serials[1])
-        f.h = math.floor(baseh * serials[1])
-    else
-        f.w = math.floor(basew * serials[1])
-        f.h = math.floor(baseh * serials[1])
-    end
-
-    win:setFrame(f)
+    local win, f, max = getWindowFrame()
+    if not win then return end
+    cycle43Window(f, max)
+    setWindowFrame(win, f)
 end)
 
+-- ------
 -- Center window
+-- ------
 hs.hotkey.bind(hyper, "C", function()
-    local win = hs.window.focusedWindow()
-    local f = win:frame()
-    local screen = win:screen()
-    local max = screen:frame()
+    local win, f, max = getWindowFrame()
+    if not win then return end
 
     f.x = max.x + (max.w - f.w) / 2
     f.y = max.y + (max.h - f.h) / 2
-    win:setFrame(f, 0)
+    setWindowFrame(win, f)
+end)
+
+-- ------
+-- Move to edges
+-- ------
+hs.hotkey.bind(hyper, "Home", function()
+    local win, f, max = getWindowFrame()
+    if not win then return end
+    
+    f.x = max.x
+    f.y = f.y
+    setWindowFrame(win, f)
+end)
+
+hs.hotkey.bind(hyper, "End", function()
+    local win, f, max = getWindowFrame()
+    if not win then return end
+    
+    f.x = max.x + (max.w - f.w)
+    f.y = f.y
+    setWindowFrame(win, f)
+end)
+
+hs.hotkey.bind(hyper, "PageUp", function()
+    local win, f, max = getWindowFrame()
+    if not win then return end
+    
+    f.x = f.x
+    f.y = max.y
+    setWindowFrame(win, f)
+end)
+
+hs.hotkey.bind(hyper, "PageDown", function()
+    local win, f, max = getWindowFrame()
+    if not win then return end
+    
+    f.x = f.x
+    f.y = max.y + (max.h - f.h)
+    setWindowFrame(win, f)
 end)

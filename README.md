@@ -8,13 +8,9 @@
 |                       | <kbd>ctrl</kbd> +<kbd>win</kbd> + <kbd>alt</kbd> |
 | <kbd>hyperShift</kbd> |       <kbd>hyper</kbd> + <kbd>shift</kbd>        |
 
-### Basic Operations
+### Moving
 
 * Center current window. <kbd>hyper</kbd> + <kbd>C</kbd>
-* Maximize current window. <kbd>hyperShift</kbd> + <kbd>M</kbd>
-* Move current window to another monitor. <kbd>hyper</kbd> + <kbd>J</kbd> or <kbd>K</kbd>
-
-### Edge Operations
 
 * Move to edges
     * Left - <kbd>hyper</kbd> + <kbd>Home</kbd>
@@ -22,7 +18,11 @@
     * Top - <kbd>hyper</kbd> + <kbd>PgUp</kbd>
     * Bottom - <kbd>hyper</kbd> + <kbd>PgDn</kbd>
 
-### Size Operations
+* Move current window to another monitor. <kbd>hyper</kbd> + <kbd>J</kbd> or <kbd>K</kbd>
+
+### Resizing
+
+* Maximize current window. <kbd>hyperShift</kbd> + <kbd>M</kbd>
 
 * Base size (4:3 window)
     * Loop through screen height ratios: 1.0, 0.9, 0.7, 0.5, 0.3. <kbd>hyper</kbd> + <kbd>M</kbd>
