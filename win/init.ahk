@@ -112,7 +112,9 @@ return
 
 ; Maximize window
 #!^+M::
-    ResizeAndCenter(1)
+    info := GetWindowFrame()
+    max := info[3]
+    LoopFixedRatio(max.w / max.h)
 return
 
 #!^M::
@@ -167,33 +169,12 @@ EnsureWindowIsRestored() {
         WinRestore, A
 }
 
-SetWindowFrame(A, NewX, NewY, NewW, NewH) {
-    EnsureWindowIsRestored() ; Always ensure the window is restored before any move or resize operation
-;    MsgBox Move to: (X/Y) %NewX%, %NewY%; (W/H) %NewW%, %NewH%
-    WinMove, A, , NewX, NewY, NewW, NewH
-}
-
-SetWindowFrame2(win, f) {
+SetWindowFrame(win, f) {
     if (win) {
-        EnsureWindowIsRestored()
+        EnsureWindowIsRestored() ; Always ensure the window is restored before any move or resize operation
+        ;    MsgBox Move to: (X/Y) %NewX%, %NewY%; (W/H) %NewW%, %NewH%
         WinMove, A, , f.x, f.y, f.w, f.h
     }
-}
-
-GetCenterCoordinates(ByRef A, MonNum, ByRef NewX, ByRef NewY, WinW, WinH) {
-    ; Set the screen variables
-    SysGet, Mon, MonitorWorkArea, %MonNum%
-    ScreenW := MonRight - MonLeft
-    ScreenH := MonBottom - MonTop
-
-    ; Calculate the position based on the given dimensions [W|H]
-    NewX := (ScreenW-WinW)/2 + MonLeft ; Adjust for monitor offset
-    NewY := (ScreenH-WinH)/2 + MonTop ; Adjust for monitor offset
-}
-
-ResizeAndCenterWindow(MonNum, NewW, NewH) {
-    GetCenterCoordinates(A, MonNum, NewX, NewY, NewW, NewH)
-    SetWindowFrame(A, NewX, NewY, NewW, NewH)
 }
 
 MoveToCenter() {
@@ -206,7 +187,7 @@ MoveToCenter() {
     f.x := max.x + (max.w - f.w) / 2
     f.y := max.y + (max.h - f.h) / 2
 
-    SetWindowFrame2(win, f)
+    SetWindowFrame(win, f)
 }
 
 MoveToEdge(Edge) {
@@ -225,7 +206,7 @@ MoveToEdge(Edge) {
     if InStr(Edge, "Bottom")
         f.y := max.y + (max.h - f.h)
 
-    SetWindowFrame2(win, f)
+    SetWindowFrame(win, f)
 }
 
 ToHalfScreen(Edge) {
@@ -260,7 +241,7 @@ ToHalfScreen(Edge) {
         f.y := max.y + (max.h - f.h)
     }
 
-    SetWindowFrame2(win, f)
+    SetWindowFrame(win, f)
 }
 
 LoopWidth(Edge) {
@@ -291,7 +272,7 @@ LoopWidth(Edge) {
     if InStr(Edge, "Right")
         f.x := max.x + (max.w - f.w)
 
-    SetWindowFrame2(win, f)
+    SetWindowFrame(win, f)
 }
 
 LoopHeight(Edge) {
@@ -318,7 +299,7 @@ LoopHeight(Edge) {
     if InStr(Edge, "Bottom")
         f.y := max.y + (max.h - f.h)
 
-    SetWindowFrame2(win, f)
+    SetWindowFrame(win, f)
 }
 
 LoopFixedRatio(ratio) {
@@ -355,48 +336,5 @@ LoopFixedRatio(ratio) {
     f.x := max.x + (max.w - f.w) / 2
     f.y := max.y + (max.h - f.h) / 2
 
-    SetWindowFrame2(win, f)
+    SetWindowFrame(win, f)
 }
-
-CalculateSizeByWinRatio(ByRef NewW, ByRef NewH, MonNum, Ratio) {
-    MonNum := GetMonitorNumber()
-    SysGet, Mon, MonitorWorkArea, %MonNum%
-    NewW := (MonRight - MonLeft) * Ratio
-    NewH := (MonBottom - MonTop) * Ratio
-}
-
-ResizeAndCenter(Ratio) {
-    MonNum := GetMonitorNumber()
-
-    ; Set the screen variables
-    SysGet, Mon, MonitorWorkArea, %MonNum%
-    ScreenW := MonRight - MonLeft
-    ScreenH := MonBottom - MonTop
-
-    ; Get current window size
-    WinGetPos, WinX, WinY, WinW, WinH, A
-
-    ; Define ratios for cycling
-    serials := [ 1.0, 0.9, 0.7, 0.5 ]
-
-    ; Calculate current ratio
-    currentRatio := WinW / ScreenW
-
-    ; Find next ratio
-    nextRatio := serials[1]
-    for i, ratio in serials {
-        if (abs(currentRatio - ratio) < 0.01) {
-            nextRatio := serials[i + 1]
-            if (!nextRatio)
-                nextRatio := serials[1]
-            break
-        }
-    }
-
-    ; Calculate new dimensions
-    NewW := Floor(ScreenW * nextRatio)
-    NewH := Floor(ScreenH * nextRatio)
-
-    ResizeAndCenterWindow(MonNum, NewW, NewH)
-}
-
