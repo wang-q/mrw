@@ -2,6 +2,22 @@
 local hyper = { "ctrl", "alt", "cmd" }
 local hyperShift = { "ctrl", "alt", "cmd", "shift" }
 
+-- window management utilities
+local function getWindowFrame()
+    local win = hs.window.focusedWindow()
+    if not win then return nil end
+    return win, win:frame(), win:screen():frame()
+end
+
+local function setWindowFrame(win, f)
+    if win then win:setFrame(f) end
+end
+
+-- screen ratios
+local WIDTH_RATIOS = { 0.75, 0.6, 0.5, 0.4, 0.25 }
+local HEIGHT_RATIOS = { 0.75, 0.5, 0.25 }
+local BASE_RATIOS = { 1.0, 0.9, 0.7, 0.5 }
+
 -- hello world
 hs.hotkey.bind(hyper, "W", function()
     hs.alert.show("Hello World!")
@@ -12,68 +28,53 @@ hs.hotkey.bind(hyperShift, "W", function()
 end)
 
 -- Move to another screen
-
 hs.hotkey.bind(hyper, "J", function()
     local win = hs.window.focusedWindow()
-    if not win then
-        return
-    end
-
-    local screen = win:screen():toEast()
-    if screen then
-        win:moveToScreen(screen)
-    end
+    if win then win:moveToScreen(win:screen():toEast()) end
 end)
 
 hs.hotkey.bind(hyper, "K", function()
     local win = hs.window.focusedWindow()
-    if not win then
-        return
-    end
-
-    local screen = win:screen():toWest()
-    if screen then
-        win:moveToScreen(screen)
-    end
+    if win then win:moveToScreen(win:screen():toWest()) end
 end)
 
+-- ------
 -- Move Window
+-- ------
 
 -- vertical half screen
 hs.hotkey.bind(hyperShift, "Left", function()
-    local win = hs.window.focusedWindow()
-    local f = win:frame()
-    local screen = win:screen()
-    local max = screen:frame()
-
+    local win, f, max = getWindowFrame()
+    if not win then return end
+    
     f.x = max.x
     f.y = max.y
     f.w = max.w / 2
     f.h = max.h
-    win:setFrame(f)
+    setWindowFrame(win, f)
 end)
 
 hs.hotkey.bind(hyperShift, "Right", function()
-    local win = hs.window.focusedWindow()
-    local f = win:frame()
-    local screen = win:screen()
-    local max = screen:frame()
-
+    local win, f, max = getWindowFrame()
+    if not win then return end
+    
     f.x = max.x + (max.w / 2)
     f.y = max.y
     f.w = max.w / 2
     f.h = max.h
-    win:setFrame(f)
+    setWindowFrame(win, f)
 end)
 
 -- loop 3/4, 3/5, 1/2, 2/5, 1/4 screen width
+
+-- loop width ratios
 hs.hotkey.bind(hyper, "Left", function()
     local win = hs.window.focusedWindow()
     local f = win:frame()
     local screen = win:screen()
     local max = screen:frame()
 
-    local serials = { 0.75, 0.6, 0.5, 0.4, 0.25 }
+    local serials = WIDTH_RATIOS
 
     if f.w == math.floor(max.w * serials[1]) then
         f.w = math.floor(max.w * serials[2])
