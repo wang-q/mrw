@@ -70,9 +70,12 @@ $Shortcut.Save()
 ```
 
 [officekey](https://superuser.com/questions/1455857/how-to-disable-office-key-keyboard-shortcut-opening-office-app)
+[ahk forum](https://www.autohotkey.com/boards/viewtopic.php?t=65573)
 
 ```cmd
 REG ADD HKCU\Software\Classes\ms-officeapp\Shell\Open\Command /t REG_SZ /d rundll32
+
+:: REG DELETE HKCU\Software\Classes\ms-officeapp\Shell
 
 ```
 
