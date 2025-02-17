@@ -8,11 +8,12 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ; MsgBox, The active window is at %X%`,%Y% with width and height [%W%, %H%]
 
 ; Hoy Key Symbols
-; Symbol	#	= Win (Windows logo key)
-; Symbol	!	= Alt
-; Symbol	^	= Control
-; Symbol	+	= Shift
-; Symbol	& = An ampersand may be used between any two keys or mouse buttons to combine them into a custom hotkey.
+; Symbol # = Win (Windows logo key)
+; Symbol ! = Alt
+; Symbol ^ = Control
+; Symbol + = Shift
+; Symbol & = An ampersand may be used between any two keys or mouse buttons to
+;            combine them into a custom hotkey.
 
 ; Watch out for the Microsoft Office Apps Pop-up!
 ; Pops up whhen user presses various combinations of Windows key with Alt and Shift and Home.
