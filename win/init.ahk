@@ -22,57 +22,6 @@ InitializeIcon() {
 }
 
 ; ----------------------------
-; Actions
-; ----------------------------
-
-; Hello world
-#!^w:: MsgBox(GetDebugInfo())
-
-#!^+w:: TrayTip("AHK", "Hello World!")
-
-; Center window
-#!^+c:: MoveToCenter()
-
-#!^c:: MoveToCenter()
-
-; Move
-#!^Home:: MoveToEdge("Left")
-
-#!^End:: MoveToEdge("Right")
-
-#!^PgUp:: MoveToEdge("Top")
-
-#!^PgDn:: MoveToEdge("Bottom")
-
-; Half screen
-#!^+Left:: ToHalfScreen("Left")
-
-#!^+Right:: ToHalfScreen("Right")
-
-#!^+Up:: ToHalfScreen("Top")
-
-#!^+Down:: ToHalfScreen("Bottom")
-
-; Loop 3/4, 3/5, 1/2, 2/5, 1/4 screen width
-#!^Left:: LoopWidth("Left")
-
-#!^Right:: LoopWidth("Right")
-
-; Loop 3/4, 1/2, 1/4 screen height
-#!^Up:: LoopHeight("Top")
-
-#!^Down:: LoopHeight("Bottom")
-
-; Maximize window
-#!^+m:: {
-    info := GetWindowFrame()
-    max := info[3]
-    LoopFixedRatio(max.w / max.h)
-}
-
-#!^m:: LoopFixedRatio(4/3)
-
-; ----------------------------
 ; Functions
 ; ----------------------------
 
@@ -280,3 +229,44 @@ LoopFixedRatio(ratio) {
 
     SetWindowFrame(win, f)
 }
+
+; ----------------------------
+; Actions
+; ----------------------------
+
+; Hello world
+#!^w:: MsgBox(GetDebugInfo())
+#!^+w:: TrayTip("AHK", "Hello World!")
+
+; Center window
+#!^+c:: MoveToCenter()
+#!^c:: MoveToCenter()
+
+; Move to edges
+#!^Home:: MoveToEdge("Left")
+#!^End:: MoveToEdge("Right")
+#!^PgUp:: MoveToEdge("Top")
+#!^PgDn:: MoveToEdge("Bottom")
+
+; Half screen
+#!^+Left:: ToHalfScreen("Left")
+#!^+Right:: ToHalfScreen("Right")
+#!^+Up:: ToHalfScreen("Top")
+#!^+Down:: ToHalfScreen("Bottom")
+
+; Loop 3/4, 3/5, 1/2, 2/5, 1/4 screen width
+#!^Left:: LoopWidth("Left")
+#!^Right:: LoopWidth("Right")
+
+; Loop 3/4, 1/2, 1/4 screen height
+#!^Up:: LoopHeight("Top")
+#!^Down:: LoopHeight("Bottom")
+
+; Maximize window
+#!^+m:: {
+    info := GetWindowFrame()
+    max := info[3]
+    LoopFixedRatio(max.w / max.h)
+}
+
+#!^m:: LoopFixedRatio(4/3)
