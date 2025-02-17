@@ -7,9 +7,9 @@ local WIDTH_RATIOS = { 0.75, 0.6, 0.5, 0.4, 0.25 }
 local HEIGHT_RATIOS = { 0.75, 0.5, 0.25 }
 local BASE_RATIOS = { 1.0, 0.9, 0.7, 0.5 }
 
--- ------
+-- ----------------------------
 -- window management utilities
--- ------
+-- ----------------------------
 local function getWindowFrame()
     local win = hs.window.focusedWindow()
     if not win then return nil end
@@ -20,9 +20,9 @@ local function setWindowFrame(win, f)
     if win then win:setFrame(f) end
 end
 
--- ------
+-- ----------------------------
 -- Key binding implementations
--- ------
+-- ----------------------------
 local function getDebugInfo()
     local win, f, max = getWindowFrame()
     if not win then return "No window focused" end
@@ -155,9 +155,11 @@ local function loopFixedRatio(ratio)
     setWindowFrame(win, f)
 end
 
--- ------
+-- ----------------------------
+-- Actions
+-- ----------------------------
+
 -- hello world
--- ------
 hs.hotkey.bind(hyper, "W", function()
     hs.alert.show(getDebugInfo())
 end)
@@ -166,23 +168,16 @@ hs.hotkey.bind(hyperShift, "W", function()
     hs.notify.new({ title = "Hammerspoon", informativeText = "Hello World" }):send()
 end)
 
-
--- ------
 -- Center window
--- ------
 hs.hotkey.bind(hyper, "C", moveToCenter)
 
--- ------
 -- Move to edges
--- ------
 hs.hotkey.bind(hyper, "Home", function() moveToEdge("Left") end)
 hs.hotkey.bind(hyper, "End", function() moveToEdge("Right") end)
 hs.hotkey.bind(hyper, "PageUp", function() moveToEdge("Top") end)
 hs.hotkey.bind(hyper, "PageDown", function() moveToEdge("Bottom") end)
 
--- ------
 -- Move to another screen
--- ------
 hs.hotkey.bind(hyper, "J", function()
     local win = hs.window.focusedWindow()
     if win then win:moveToScreen(win:screen():toEast()) end
@@ -193,25 +188,21 @@ hs.hotkey.bind(hyper, "K", function()
     if win then win:moveToScreen(win:screen():toWest()) end
 end)
 
--- ------
 -- Half screen
--- ------
 hs.hotkey.bind(hyperShift, "Left", function() toHalfScreen("Left") end)
 hs.hotkey.bind(hyperShift, "Right", function() toHalfScreen("Right") end)
 hs.hotkey.bind(hyperShift, "Up", function() toHalfScreen("Top") end)
 hs.hotkey.bind(hyperShift, "Down", function() toHalfScreen("Bottom") end)
 
--- ------
--- Loops
--- ------
+-- Loop 3/4, 3/5, 1/2, 2/5, 1/4 screen width
 hs.hotkey.bind(hyper, "Left", function() loopWidth("Left") end)
 hs.hotkey.bind(hyper, "Right", function() loopWidth("Right") end)
+
+-- Loop 3/4, 1/2, 1/4 screen height
 hs.hotkey.bind(hyper, "Up", function() loopHeight("Top") end)
 hs.hotkey.bind(hyper, "Down", function() loopHeight("Bottom") end)
 
--- ------
 -- Maximize window
--- ------
 hs.hotkey.bind(hyperShift, "M", function()
     local win, f, max = getWindowFrame()
     if not win then return end
