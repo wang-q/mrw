@@ -256,19 +256,22 @@ LoopWidth(Edge) {
     ; Only change width
     serials := [ 0.75, 0.6, 0.5, 0.4, 0.25 ]
 
-    if ( f.w = Floor(max.w * serials[1]) ) {
-        f.w := Floor(max.w * serials[2])
-    } else if ( f.w = Floor(max.w * serials[2]) ) {
-        f.w := Floor(max.w * serials[3])
-    } else if ( f.w = Floor(max.w * serials[3]) ) {
-        f.w := Floor(max.w * serials[4])
-    } else if ( f.w = Floor(max.w * serials[4]) ) {
-        f.w := Floor(max.w * serials[5])
-    } else if ( f.w = Floor(max.w * serials[5]) ) {
-        f.w := Floor(max.w * serials[1])
-    } else {
-        f.w := Floor(max.w * serials[1])
+    ; Calculate current width ratio
+    current := f.w / max.w
+
+    ; Find next serial
+    nextSerial := serials[1]
+    for i, r in serials {
+        if (abs(current - r) < 0.01) {
+            nextSerial := serials[i + 1]
+            if (!nextSerial)
+                nextSerial := serials[1]
+            break
+        }
     }
+
+    ; Apply new width
+    f.w := Floor(max.w * nextSerial)
 
     if InStr(Edge, "Left")
         f.x := max.x
@@ -287,15 +290,22 @@ LoopHeight(Edge) {
     ; Only change height
     serials := [ 0.75, 0.5, 0.25 ]
 
-    if ( f.h = Floor(max.h * serials[1]) ) {
-        f.h := Floor(max.h * serials[2])
-    } else if ( f.h = Floor(max.h * serials[2]) ) {
-        f.h := Floor(max.h * serials[3])
-    } else if ( f.h = Floor(max.h * serials[3]) ) {
-        f.h := Floor(max.h * serials[1])
-    } else {
-        f.h := Floor(max.h * serials[1])
+    ; Calculate current height ratio
+    current := f.h / max.h
+
+    ; Find next serial
+    nextSerial := serials[1]
+    for i, r in serials {
+        if (abs(current - r) < 0.01) {
+            nextSerial := serials[i + 1]
+            if (!nextSerial)
+                nextSerial := serials[1]
+            break
+        }
     }
+
+    ; Apply new height
+    f.h := Floor(max.h * nextSerial)
 
     if InStr(Edge, "Top")
         f.y := max.y
