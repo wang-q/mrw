@@ -15,17 +15,6 @@ SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
 ; Symbol & = An ampersand may be used between any two keys or mouse buttons to
 ;            combine them into a custom hotkey.
 
-; Watch out for the Microsoft Office Apps Pop-up!
-; Pops up whhen user presses various combinations of Windows key with Alt and Shift and Home.
-; To disable the Microsoft Office 360 pop-up, add this registry ket to your system:
-; Note: Solution taken from AHK Forum: https://www.autohotkey.com/boards/viewtopic.php?t=65573
-; ----
-; Run: REG ADD HKCU\Software\Classes\ms-officeapp\Shell\Open\Command /t REG_SZ /d rundll32
-; This will add a registry key that will make the Office key run a useless command, effectively disabling it.
-; It does not block the individual hot keys - it only removes the loading of the Office app.
-; To reverse it, just delete the key (the Shell folder did not previously exist, so it can be completely removed)
-; Run: REG DELETE HKCU\Software\Classes\ms-officeapp\Shell
-
 ; ----------------------------
 ; Icon
 ; ----------------------------
@@ -44,46 +33,29 @@ InitializeIcon() {
 
 ; Hello world
 #!^W::
-    MsgBox, Hello World!
+    info := GetWindowFrame()
+    win := info[1]
+    f := info[2]
+    max := info[3]
+    MonNum := GetMonitorNumber()
+    msg := "Monitor: " . MonNum
+        . "`nWindow ID: " . win
+        . "`nWindow Frame: [" . f.x . ", " . f.y . ", " . f.w . ", " . f.h . "]"
+        . "`nScreen Frame: [" . max.x . ", " . max.y . ", " . max.w . ", " . max.h . "]"
+    MsgBox % msg
 return
 
 #!^+W::
     TrayTip, AHK, Hello World!
 return
 
-; Loop 3/4, 3/5, 1/2, 2/5, 1/4 screen width
-#!^Left::
-    LoopW("Left")
+; Center window
+#!^+C::
+    MoveWindowToCenter()
 return
 
-#!^Right::
-    LoopW("Right")
-return
-
-; Loop 3/4, 1/2, 1/4 screen height
-#!^Up::
-    LoopH("Top")
-return
-
-#!^Down::
-    LoopH("Bottom")
-return
-
-; Half screen
-#!^+Left::
-    ToHS("Left")
-return
-
-#!^+Right::
-    ToHS("Right")
-return
-
-#!^+Up::
-    ToHS("Top")
-return
-
-#!^+Down::
-    ToHS("Bottom")
+#!^C::
+    MoveWindowToCenter()
 return
 
 ; Move
@@ -103,13 +75,39 @@ return
     MoveToEdge("Bottom")
 return
 
-; Center window
-#!^+C::
-    MoveWindowToCenter()
+; Half screen
+#!^+Left::
+    ToHalfScreen("Left")
 return
 
-#!^C::
-    MoveWindowToCenter()
+#!^+Right::
+    ToHalfScreen("Right")
+return
+
+#!^+Up::
+    ToHalfScreen("Top")
+return
+
+#!^+Down::
+    ToHalfScreen("Bottom")
+return
+
+; Loop 3/4, 3/5, 1/2, 2/5, 1/4 screen width
+#!^Left::
+    LoopWidth("Left")
+return
+
+#!^Right::
+    LoopWidth("Right")
+return
+
+; Loop 3/4, 1/2, 1/4 screen height
+#!^Up::
+    LoopHeight("Top")
+return
+
+#!^Down::
+    LoopHeight("Bottom")
 return
 
 ; Maximize window
@@ -118,14 +116,14 @@ return
 return
 
 #!^M::
-    LoopM()
+    LoopFixedRatio()
 return
 
 ; ----------------------------
 ; Functions
 ; ----------------------------
 
-GetWindowNumber() {
+GetMonitorNumber() {
     ; Get the Active window
     WinGetPos, WinX, WinY, WinW, WinH, A  ; "A" to get the active window's pos.
     SysGet, numMonitors, MonitorCount
@@ -139,23 +137,47 @@ GetWindowNumber() {
     return 1    ; If we can't find a matching window, just return 1 (Primary)
 }
 
+GetWindowFrame() {
+    ; Get the Active window
+    WinGet, win, ID, A
+    WinGetPos, WinX, WinY, WinW, WinH, A
+
+    ; Get monitor info
+    MonNum := GetMonitorNumber()
+    SysGet, Mon, MonitorWorkArea, %MonNum%
+
+    ; Create frame object
+    f := { x: WinX
+        , y: WinY
+        , w: WinW
+        , h: WinH }
+
+    ; Create screen object
+    max := { x: MonLeft
+           , y: MonTop
+           , w: MonRight - MonLeft
+           , h: MonBottom - MonTop }
+
+    return [win, f, max]
+}
+
 EnsureWindowIsRestored() {
     WinGet, ActiveWinState, MinMax, A
     if (ActiveWinState != 0)
         WinRestore, A
 }
 
-RestoreMoveAndResize(A, NewX, NewY, NewW, NewH) {
+SetWindowFrame(A, NewX, NewY, NewW, NewH) {
     EnsureWindowIsRestored() ; Always ensure the window is restored before any move or resize operation
 ;    MsgBox Move to: (X/Y) %NewX%, %NewY%; (W/H) %NewW%, %NewH%
     WinMove, A, , NewX, NewY, NewW, NewH
 }
 
-ToHS(Edge) {
-    WinNum := GetWindowNumber()
+ToHalfScreen(Edge) {
+    MonNum := GetMonitorNumber()
 
     ; Set the screen variables
-    SysGet, Mon, MonitorWorkArea, %WinNum%
+    SysGet, Mon, MonitorWorkArea, %MonNum%
     ScreenW := MonRight - MonLeft
     ScreenH := MonBottom - MonTop
 
@@ -185,14 +207,14 @@ ToHS(Edge) {
         NewY := MonBottom - NewH
     }
 
-    RestoreMoveAndResize(A, NewX, NewY, NewW, NewH)
+    SetWindowFrame(A, NewX, NewY, NewW, NewH)
 }
 
-LoopW(Edge) {
-    WinNum := GetWindowNumber()
+LoopWidth(Edge) {
+    MonNum := GetMonitorNumber()
 
     ; Set the screen variables
-    SysGet, Mon, MonitorWorkArea, %WinNum%
+    SysGet, Mon, MonitorWorkArea, %MonNum%
     ScreenW := MonRight - MonLeft
     ScreenH := MonBottom - MonTop
 
@@ -221,14 +243,14 @@ LoopW(Edge) {
     if InStr(Edge, "Right")
         NewX := MonRight - NewW
 
-    RestoreMoveAndResize(A, NewX, NewY, NewW, NewH)
+    SetWindowFrame(A, NewX, NewY, NewW, NewH)
 }
 
-LoopH(Edge) {
-    WinNum := GetWindowNumber()
+LoopHeight(Edge) {
+    MonNum := GetMonitorNumber()
 
     ; Set the screen variables
-    SysGet, Mon, MonitorWorkArea, %WinNum%
+    SysGet, Mon, MonitorWorkArea, %MonNum%
     ScreenW := MonRight - MonLeft
     ScreenH := MonBottom - MonTop
 
@@ -253,12 +275,12 @@ LoopH(Edge) {
     if InStr(Edge, "Bottom")
         NewY := MonBottom - NewH
 
-    RestoreMoveAndResize(A, NewX, NewY, NewW, NewH)
+    SetWindowFrame(A, NewX, NewY, NewW, NewH)
 }
 
-GetCenterCoordinates(ByRef A, WinNum, ByRef NewX, ByRef NewY, WinW, WinH) {
+GetCenterCoordinates(ByRef A, MonNum, ByRef NewX, ByRef NewY, WinW, WinH) {
     ; Set the screen variables
-    SysGet, Mon, MonitorWorkArea, %WinNum%
+    SysGet, Mon, MonitorWorkArea, %MonNum%
     ScreenW := MonRight - MonLeft
     ScreenH := MonBottom - MonTop
 
@@ -267,16 +289,16 @@ GetCenterCoordinates(ByRef A, WinNum, ByRef NewX, ByRef NewY, WinW, WinH) {
     NewY := (ScreenH-WinH)/2 + MonTop ; Adjust for monitor offset
 }
 
-DoResizeAndCenter(WinNum, NewW, NewH) {
-    GetCenterCoordinates(A, WinNum, NewX, NewY, NewW, NewH)
-    RestoreMoveAndResize(A, NewX, NewY, NewW, NewH)
+ResizeAndCenterWindow(MonNum, NewW, NewH) {
+    GetCenterCoordinates(A, MonNum, NewX, NewY, NewW, NewH)
+    SetWindowFrame(A, NewX, NewY, NewW, NewH)
 }
 
-LoopM() {
-    WinNum := GetWindowNumber()
+LoopFixedRatio() {
+    MonNum := GetMonitorNumber()
 
     ; Set the screen variables
-    SysGet, Mon, MonitorWorkArea, %WinNum%
+    SysGet, Mon, MonitorWorkArea, %MonNum%
     ScreenW := MonRight - MonLeft
     ScreenH := MonBottom - MonTop
 
@@ -306,20 +328,20 @@ LoopM() {
         NewH := Floor(BaseH * serials[1])
     }
 
-    DoResizeAndCenter(WinNum, NewW, NewH)
+    ResizeAndCenterWindow(MonNum, NewW, NewH)
 }
 
 MoveWindowToCenter() {
     WinGetPos, WinX, WinY, WinW, WinH, A  ; "A" to get the active window's pos.
-    WinNum := GetWindowNumber()
-    DoResizeAndCenter(WinNum, WinW, WinH)
+    MonNum := GetMonitorNumber()
+    ResizeAndCenterWindow(MonNum, WinW, WinH)
     return
 }
 
 MoveToEdge(Edge) {
     ; Get monitor and window dimensions
-    WinNum := GetWindowNumber()
-    SysGet, Mon, MonitorWorkArea, %WinNum%
+    MonNum := GetMonitorNumber()
+    SysGet, Mon, MonitorWorkArea, %MonNum%
     WinGetPos, WinX, WinY, WinW, WinH, A  ; "A" to get the active window's pos.
 
     ; Set window coordinates
@@ -333,19 +355,49 @@ MoveToEdge(Edge) {
         NewY := MonBottom - WinH
 
     ; MsgBox NewX/NewY = %NewX%,%NewY%
-    RestoreMoveAndResize(A, NewX, NewY, NewW, NewH)
+    SetWindowFrame(A, NewX, NewY, NewW, NewH)
     return
 }
 
-CalculateSizeByWinRatio(ByRef NewW, ByRef NewH, WinNum, Ratio) {
-    WinNum := GetWindowNumber()
-    SysGet, Mon, MonitorWorkArea, %WinNum%
+CalculateSizeByWinRatio(ByRef NewW, ByRef NewH, MonNum, Ratio) {
+    MonNum := GetMonitorNumber()
+    SysGet, Mon, MonitorWorkArea, %MonNum%
     NewW := (MonRight - MonLeft) * Ratio
     NewH := (MonBottom - MonTop) * Ratio
 }
 
 ResizeAndCenter(Ratio) {
-    WinNum := GetWindowNumber()
-    CalculateSizeByWinRatio(NewW, NewH, WinNum, Ratio)
-    DoResizeAndCenter(WinNum, NewW, NewH)
+    MonNum := GetMonitorNumber()
+
+    ; Set the screen variables
+    SysGet, Mon, MonitorWorkArea, %MonNum%
+    ScreenW := MonRight - MonLeft
+    ScreenH := MonBottom - MonTop
+
+    ; Get current window size
+    WinGetPos, WinX, WinY, WinW, WinH, A
+
+    ; Define ratios for cycling
+    serials := [ 1.0, 0.9, 0.7, 0.5 ]
+
+    ; Calculate current ratio
+    currentRatio := WinW / ScreenW
+
+    ; Find next ratio
+    nextRatio := serials[1]
+    for i, ratio in serials {
+        if (abs(currentRatio - ratio) < 0.01) {
+            nextRatio := serials[i + 1]
+            if (!nextRatio)
+                nextRatio := serials[1]
+            break
+        }
+    }
+
+    ; Calculate new dimensions
+    NewW := Floor(ScreenW * nextRatio)
+    NewH := Floor(ScreenH * nextRatio)
+
+    ResizeAndCenterWindow(MonNum, NewW, NewH)
 }
+
