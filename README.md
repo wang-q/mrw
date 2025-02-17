@@ -4,39 +4,40 @@
 
 |        Symbol         |                       Key                        |
 |:---------------------:|:------------------------------------------------:|
-|   <kbd>hyper</kbd>    | <kbd>ctrl</kbd> +<kbd>opt</kbd> + <kbd>cmd</kbd> |
-|                       | <kbd>ctrl</kbd> +<kbd>win</kbd> + <kbd>alt</kbd> |
-| <kbd>hyperShift</kbd> |       <kbd>hyper</kbd> + <kbd>shift</kbd>        |
+|   <kbd>hyper</kbd>    | <kbd>ctrl</kbd>+<kbd>opt</kbd>+<kbd>cmd</kbd> |
+|                       | <kbd>ctrl</kbd>+<kbd>win</kbd>+<kbd>alt</kbd> |
+| <kbd>hyperShift</kbd> |       <kbd>hyper</kbd>+<kbd>shift</kbd>        |
 
 ### Moving
 
-* Center current window. <kbd>hyper</kbd> + <kbd>C</kbd>
+* Center current window. <kbd>hyper</kbd>+<kbd>C</kbd>
 
 * Move to edges
-    * Left - <kbd>hyper</kbd> + <kbd>Home</kbd>
-    * Right - <kbd>hyper</kbd> + <kbd>End</kbd>
-    * Top - <kbd>hyper</kbd> + <kbd>PgUp</kbd>
-    * Bottom - <kbd>hyper</kbd> + <kbd>PgDn</kbd>
+    * Left   - <kbd>hyper</kbd>+<kbd>Home</kbd>
+    * Right  - <kbd>hyper</kbd>+<kbd>End</kbd>
+    * Top    - <kbd>hyper</kbd>+<kbd>PgUp</kbd>
+    * Bottom - <kbd>hyper</kbd>+<kbd>PgDn</kbd>
 
-* Move current window to another monitor. <kbd>hyper</kbd> + <kbd>J</kbd> or <kbd>K</kbd>
+* Move current window to another monitor. <kbd>hyper</kbd>+<kbd>J</kbd>/<kbd>K</kbd>
 
 ### Resizing
 
-* Maximize current window. <kbd>hyperShift</kbd> + <kbd>M</kbd>
+* Fixed ratio window
+    * Native ratio window (first maximize, then loop through ratios: 0.9, 0.7, 0.5). <kbd>hyperShift</kbd>+<kbd>M</kbd>
+    * 4:3 ratio window (loop through ratios: 1.0, 0.9, 0.7, 0.5). <kbd>hyper</kbd>+<kbd>M</kbd>
 
-* Base size (4:3 window)
-    * Loop through screen height ratios: 1.0, 0.9, 0.7, 0.5, 0.3. <kbd>hyper</kbd> + <kbd>M</kbd>
 * Width adjustments
-    * Loop through screen width ratios: 3/4, 3/5, 1/2, 2/5, 1/4. <kbd>hyper</kbd> + <kbd>Left</kbd> or <kbd>Right</kbd>
-    * Set to vertical half screen. <kbd>hyperShift</kbd> + <kbd>Left</kbd> or <kbd>Right</kbd>
+    * Loop through screen width ratios: 3/4, 3/5, 1/2, 2/5, 1/4. <kbd>hyper</kbd>+<kbd>Left</kbd>/<kbd>Right</kbd>
+    * Set to vertical half screen. <kbd>hyperShift</kbd>+<kbd>Left</kbd>/<kbd>Right</kbd>
+
 * Height adjustments
-    * Loop through screen height ratios: 3/4, 1/2, 1/4. <kbd>hyper</kbd> + <kbd>Up</kbd> or <kbd>Down</kbd>
-    * Set to horizontal half screen. <kbd>hyperShift</kbd> + <kbd>Up</kbd> or <kbd>Down</kbd>
+    * Loop through screen height ratios: 3/4, 1/2, 1/4. <kbd>hyper</kbd>+<kbd>Up</kbd>/<kbd>Down</kbd>
+    * Set to horizontal half screen. <kbd>hyperShift</kbd>+<kbd>Up</kbd>/<kbd>Down</kbd>
 
 ### Testing
 
-* Alert. <kbd>hyper</kbd> + <kbd>W</kbd>
-* Notify. <kbd>hyperShift</kbd> + <kbd>W</kbd>
+* Alert. <kbd>hyper</kbd>+<kbd>W</kbd>
+* Notify. <kbd>hyperShift</kbd>+<kbd>W</kbd>
 
 ## macOS - Hammerspoon
 

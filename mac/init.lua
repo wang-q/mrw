@@ -48,8 +48,8 @@ local function cycleRatios(f, max, ratios, isWidth, alignRight)
     return true
 end
 
-local function cycle43Window(f, max)
-    local basew = math.floor(max.h * 4 / 3)
+local function cycleFixedRatioWindow(f, max, ratio)
+    local basew = math.floor(max.h * ratio)
     local baseh = max.h
     
     f.x = max.x
@@ -73,7 +73,9 @@ end
 -- hello world
 -- ------
 hs.hotkey.bind(hyper, "W", function()
-    hs.alert.show("Hello World!")
+    local win, f, max = getWindowFrame()
+    if not win then return end
+    hs.alert.show(string.format("Valid screen size: %d x %d", max.w, max.h))
 end)
 
 hs.hotkey.bind(hyperShift, "W", function()
@@ -181,18 +183,14 @@ end)
 hs.hotkey.bind(hyperShift, "M", function()
     local win, f, max = getWindowFrame()
     if not win then return end
-
-    f.x = max.x
-    f.y = max.y
-    f.w = max.w
-    f.h = max.h
+    cycleFixedRatioWindow(f, max, max.w/max.h)
     setWindowFrame(win, f)
 end)
 
 hs.hotkey.bind(hyper, "M", function()
     local win, f, max = getWindowFrame()
     if not win then return end
-    cycle43Window(f, max)
+    cycleFixedRatioWindow(f, max, 4/3)
     setWindowFrame(win, f)
 end)
 
