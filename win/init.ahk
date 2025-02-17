@@ -229,108 +229,96 @@ MoveToEdge(Edge) {
 }
 
 ToHalfScreen(Edge) {
-    MonNum := GetMonitorNumber()
-
-    ; Set the screen variables
-    SysGet, Mon, MonitorWorkArea, %MonNum%
-    ScreenW := MonRight - MonLeft
-    ScreenH := MonBottom - MonTop
+    info := GetWindowFrame()
+    win := info[1]
+    f := info[2]
+    max := info[3]
 
     ; Set window coordinates
     if InStr(Edge, "Left") {
-        NewW := Floor(ScreenW / 2)
-        NewH := ScreenH
-        NewX := MonLeft
-        NewY := MonTop
+        f.w := Floor(max.w / 2)
+        f.h := max.h
+        f.x := max.x
+        f.y := max.y
     }
     if InStr(Edge, "Right") {
-        NewW := Floor(ScreenW / 2)
-        NewH := ScreenH
-        NewX := MonRight - NewW
-        NewY := MonTop
+        f.w := Floor(max.w / 2)
+        f.h := max.h
+        f.x := max.x + (max.w - f.w)
+        f.y := max.y
     }
     if InStr(Edge, "Top") {
-        NewW := ScreenW
-        NewH := Floor(ScreenH / 2)
-        NewX := MonLeft
-        NewY := MonTop
+        f.w := max.w
+        f.h := Floor(max.h / 2)
+        f.x := max.x
+        f.y := max.y
     }
     if InStr(Edge, "Bottom") {
-        NewW := ScreenW
-        NewH := Floor(ScreenH / 2)
-        NewX := MonLeft
-        NewY := MonBottom - NewH
+        f.w := max.w
+        f.h := Floor(max.h / 2)
+        f.x := max.x
+        f.y := max.y + (max.h - f.h)
     }
 
-    SetWindowFrame(A, NewX, NewY, NewW, NewH)
+    SetWindowFrame2(win, f)
 }
 
 LoopWidth(Edge) {
-    MonNum := GetMonitorNumber()
-
-    ; Set the screen variables
-    SysGet, Mon, MonitorWorkArea, %MonNum%
-    ScreenW := MonRight - MonLeft
-    ScreenH := MonBottom - MonTop
-
-    ; "A" to get the active window's pos
-    WinGetPos, WinX, WinY, WinW, WinH, A
+    info := GetWindowFrame()
+    win := info[1]
+    f := info[2]
+    max := info[3]
 
     ; Only change width
     serials := [ 0.75, 0.6, 0.5, 0.4, 0.25 ]
 
-    if ( WinW = Floor(ScreenW * serials[1]) ) {
-        NewW := Floor(ScreenW * serials[2])
-    } else if ( WinW = Floor(ScreenW * serials[2]) ) {
-        NewW := Floor(ScreenW * serials[3])
-    } else if ( WinW = Floor(ScreenW * serials[3]) ) {
-        NewW := Floor(ScreenW * serials[4])
-    } else if ( WinW = Floor(ScreenW * serials[4]) ) {
-        NewW := Floor(ScreenW * serials[5])
-    } else if ( WinW = Floor(ScreenW * serials[5]) ) {
-        NewW := Floor(ScreenW * serials[1])
+    if ( f.w = Floor(max.w * serials[1]) ) {
+        f.w := Floor(max.w * serials[2])
+    } else if ( f.w = Floor(max.w * serials[2]) ) {
+        f.w := Floor(max.w * serials[3])
+    } else if ( f.w = Floor(max.w * serials[3]) ) {
+        f.w := Floor(max.w * serials[4])
+    } else if ( f.w = Floor(max.w * serials[4]) ) {
+        f.w := Floor(max.w * serials[5])
+    } else if ( f.w = Floor(max.w * serials[5]) ) {
+        f.w := Floor(max.w * serials[1])
     } else {
-        NewW := Floor(ScreenW * serials[1])
+        f.w := Floor(max.w * serials[1])
     }
 
     if InStr(Edge, "Left")
-        NewX := MonLeft
+        f.x := max.x
     if InStr(Edge, "Right")
-        NewX := MonRight - NewW
+        f.x := max.x + (max.w - f.w)
 
-    SetWindowFrame(A, NewX, NewY, NewW, NewH)
+    SetWindowFrame2(win, f)
 }
 
 LoopHeight(Edge) {
-    MonNum := GetMonitorNumber()
+    info := GetWindowFrame()
+    win := info[1]
+    f := info[2]
+    max := info[3]
 
-    ; Set the screen variables
-    SysGet, Mon, MonitorWorkArea, %MonNum%
-    ScreenW := MonRight - MonLeft
-    ScreenH := MonBottom - MonTop
-
-    ; "A" to get the active window's pos
-    WinGetPos, WinX, WinY, WinW, WinH, A
-
-    ; Only change width
+    ; Only change height
     serials := [ 0.75, 0.5, 0.25 ]
 
-    if ( WinH = Floor(ScreenH * serials[1]) ) {
-        NewH := Floor(ScreenH * serials[2])
-    } else if ( WinH = Floor(ScreenH * serials[2]) ) {
-        NewH := Floor(ScreenH * serials[3])
-    } else if ( WinH = Floor(ScreenH * serials[3]) ) {
-        NewH := Floor(ScreenH * serials[1])
+    if ( f.h = Floor(max.h * serials[1]) ) {
+        f.h := Floor(max.h * serials[2])
+    } else if ( f.h = Floor(max.h * serials[2]) ) {
+        f.h := Floor(max.h * serials[3])
+    } else if ( f.h = Floor(max.h * serials[3]) ) {
+        f.h := Floor(max.h * serials[1])
     } else {
-        NewH := Floor(ScreenH * serials[1])
+        f.h := Floor(max.h * serials[1])
     }
 
     if InStr(Edge, "Top")
-        NewY := MonTop
+        f.y := max.y
     if InStr(Edge, "Bottom")
-        NewY := MonBottom - NewH
+        f.y := max.y + (max.h - f.h)
 
-    SetWindowFrame(A, NewX, NewY, NewW, NewH)
+    SetWindowFrame2(win, f)
 }
 
 LoopFixedRatio() {
