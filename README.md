@@ -50,14 +50,12 @@ bash mac/install.sh
 
 ```
 
-## Windows - AutoHotkey v1
+## Windows - AutoHotkey v2
 
 [Download here](https://www.autohotkey.com/) or
-`winget install -s msstore --accept-package-agreements "AutoHotkey Store Edition"`.
+`winget install --id AutoHotkey.AutoHotkey`.
 
-If you want the program to start automatically at startup, see [here](https://hackmd.io/@xwater8/r1G5e7RXL).
-
-Or run the following codes:
+If you want the program to start automatically at startup, run the following codes:
 
 ```powershell
 $WshShell = New-Object -comObject WScript.Shell

@@ -1,11 +1,6 @@
-﻿#NoEnv  ; Recommended for performance and compatibility with future AutoHotkey releases.
-; #Warn  ; Enable warnings to assist with detecting common errors.
-SendMode Input  ; Recommended for new scripts due to its superior speed and reliability.
-SetWorkingDir %A_ScriptDir%  ; Ensures a consistent starting directory.
-
-; Notes:
-; WinGetPos, X, Y, W, H, A  ; "A" to get the active window's pos.
-; MsgBox, The active window is at %X%`,%Y% with width and height [%W%, %H%]
+﻿#Requires AutoHotkey v2.0
+#SingleInstance Force
+SetWorkingDir A_ScriptDir
 
 ; Hoy Key Symbols
 ; Symbol # = Win (Windows logo key)
@@ -22,9 +17,8 @@ InitializeIcon()
 
 InitializeIcon() {
     ; Set the System tray icon (should sit next to the AHK file)
-    if FileExist("icon.ico") {
-        Menu, Tray, Icon, icon.ico
-    }
+    if FileExist("icon.ico")
+        TraySetIcon("icon.ico")
 }
 
 ; ----------------------------
@@ -32,124 +26,87 @@ InitializeIcon() {
 ; ----------------------------
 
 ; Hello world
-#!^W::
-    MsgBox % GetDebugInfo()
-return
+#!^w:: MsgBox(GetDebugInfo())
 
-#!^+W::
-    TrayTip, AHK, Hello World!
-return
+#!^+w:: TrayTip("AHK", "Hello World!")
 
 ; Center window
-#!^+C::
-    MoveToCenter()
-return
+#!^+c:: MoveToCenter()
 
-#!^C::
-    MoveToCenter()
-return
+#!^c:: MoveToCenter()
 
 ; Move
-#!^Home::
-    MoveToEdge("Left")
-return
+#!^Home:: MoveToEdge("Left")
 
-#!^End::
-    MoveToEdge("Right")
-return
+#!^End:: MoveToEdge("Right")
 
-#!^PgUp::
-    MoveToEdge("Top")
-return
+#!^PgUp:: MoveToEdge("Top")
 
-#!^PgDn::
-    MoveToEdge("Bottom")
-return
+#!^PgDn:: MoveToEdge("Bottom")
 
 ; Half screen
-#!^+Left::
-    ToHalfScreen("Left")
-return
+#!^+Left:: ToHalfScreen("Left")
 
-#!^+Right::
-    ToHalfScreen("Right")
-return
+#!^+Right:: ToHalfScreen("Right")
 
-#!^+Up::
-    ToHalfScreen("Top")
-return
+#!^+Up:: ToHalfScreen("Top")
 
-#!^+Down::
-    ToHalfScreen("Bottom")
-return
+#!^+Down:: ToHalfScreen("Bottom")
 
 ; Loop 3/4, 3/5, 1/2, 2/5, 1/4 screen width
-#!^Left::
-    LoopWidth("Left")
-return
+#!^Left:: LoopWidth("Left")
 
-#!^Right::
-    LoopWidth("Right")
-return
+#!^Right:: LoopWidth("Right")
 
 ; Loop 3/4, 1/2, 1/4 screen height
-#!^Up::
-    LoopHeight("Top")
-return
+#!^Up:: LoopHeight("Top")
 
-#!^Down::
-    LoopHeight("Bottom")
-return
+#!^Down:: LoopHeight("Bottom")
 
 ; Maximize window
-#!^+M::
+#!^+m:: {
     info := GetWindowFrame()
     max := info[3]
     LoopFixedRatio(max.w / max.h)
-return
+}
 
-#!^M::
-    LoopFixedRatio(4/3)
-return
+#!^m:: LoopFixedRatio(4/3)
 
 ; ----------------------------
 ; Functions
 ; ----------------------------
 
 GetMonitorNumber() {
-    ; Get the Active window
-    WinGetPos, WinX, WinY, WinW, WinH, A  ; "A" to get the active window's pos.
-    SysGet, numMonitors, MonitorCount
-    Loop %numMonitors% {
-        SysGet, monitor, MonitorWorkArea, %A_Index%
-        if (monitorLeft <= WinX && WinX < monitorRight && monitorTop <= WinY && WinY <= monitorBottom){
-            ; We have found the monitor that this window sits inside (at least the top-left corner)
-            return %A_Index%
-        }
+    WinGetPos &WinX, &WinY,,, "A"  ; "A" to get the active window's pos.
+    monitorCount := MonitorGetCount()
+    Loop monitorCount {
+        MonitorGet(A_Index, &Left, &Top, &Right, &Bottom)
+        if (Left <= WinX && WinX < Right && Top <= WinY && WinY <= Bottom)
+            return A_Index
     }
-    return 1    ; If we can't find a matching window, just return 1 (Primary)
+    return 1  ; If we can't find a matching window, just return 1 (Primary)
 }
 
 GetWindowFrame() {
-    ; Get the Active window
-    WinGet, win, ID, A
-    WinGetPos, WinX, WinY, WinW, WinH, A
+    win := WinGetID("A")
+    WinGetPos &WinX, &WinY, &WinW, &WinH, "A"
 
-    ; Get monitor info
     MonNum := GetMonitorNumber()
-    SysGet, Mon, MonitorWorkArea, %MonNum%
+    MonitorGet(MonNum, &Left, &Top, &Right, &Bottom)
 
-    ; Create frame object
-    f := { x: WinX
-        , y: WinY
-        , w: WinW
-        , h: WinH }
+    f := {
+        x: WinX,
+        y: WinY,
+        w: WinW,
+        h: WinH
+    }
 
-    ; Create screen object
-    max := { x: MonLeft
-           , y: MonTop
-           , w: MonRight - MonLeft
-           , h: MonBottom - MonTop }
+    max := {
+        x: Left,
+        y: Top,
+        w: Right - Left,
+        h: Bottom - Top
+    }
 
     return [win, f, max]
 }
@@ -160,23 +117,19 @@ GetDebugInfo() {
     f := info[2]
     max := info[3]
     MonNum := GetMonitorNumber()
-    return "Monitor: " . MonNum
-        . "`nWindow ID: " . win
-        . "`nWindow Frame: [" . f.x . ", " . f.y . ", " . f.w . ", " . f.h . "]"
-        . "`nScreen Frame: [" . max.x . ", " . max.y . ", " . max.w . ", " . max.h . "]"
+    return Format("Monitor: {}`nWindow ID: {}`nWindow Frame: [{}, {}, {}, {}]`nScreen Frame: [{}, {}, {}, {}]",
+        MonNum, win, f.x, f.y, f.w, f.h, max.x, max.y, max.w, max.h)
 }
 
 EnsureWindowIsRestored() {
-    WinGet, ActiveWinState, MinMax, A
-    if (ActiveWinState != 0)
-        WinRestore, A
+    if (WinGetMinMax("A") != 0)
+        WinRestore("A")
 }
 
 SetWindowFrame(win, f) {
-    if (win) {
-        EnsureWindowIsRestored() ; Always ensure the window is restored before any move or resize operation
-        ;    MsgBox Move to: (X/Y) %NewX%, %NewY%; (W/H) %NewW%, %NewH%
-        WinMove, A, , f.x, f.y, f.w, f.h
+    if win {
+        EnsureWindowIsRestored()
+        WinMove(f.x, f.y, f.w, f.h, "ahk_id " win)
     }
 }
 
@@ -186,7 +139,6 @@ MoveToCenter() {
     f := info[2]
     max := info[3]
 
-    ; Calculate center position directly
     f.x := max.x + (max.w - f.w) / 2
     f.y := max.y + (max.h - f.h) / 2
 
@@ -199,7 +151,6 @@ MoveToEdge(Edge) {
     f := info[2]
     max := info[3]
 
-    ; Set window coordinates
     if InStr(Edge, "Left")
         f.x := max.x
     if InStr(Edge, "Right")
@@ -218,7 +169,6 @@ ToHalfScreen(Edge) {
     f := info[2]
     max := info[3]
 
-    ; Set window coordinates
     if InStr(Edge, "Left") {
         f.w := Floor(max.w / 2)
         f.h := max.h
@@ -253,24 +203,17 @@ LoopWidth(Edge) {
     f := info[2]
     max := info[3]
 
-    ; Only change width
-    serials := [ 0.75, 0.6, 0.5, 0.4, 0.25 ]
-
-    ; Calculate current width ratio
+    serials := [0.75, 0.6, 0.5, 0.4, 0.25]
     current := f.w / max.w
 
-    ; Find next serial
     nextSerial := serials[1]
     for i, r in serials {
-        if (abs(current - r) < 0.01) {
-            nextSerial := serials[i + 1]
-            if (!nextSerial)
-                nextSerial := serials[1]
+        if (Abs(current - r) < 0.01) {
+            nextSerial := i = serials.Length ? serials[1] : serials[i + 1]
             break
         }
     }
 
-    ; Apply new width
     f.w := Floor(max.w * nextSerial)
 
     if InStr(Edge, "Left")
@@ -287,24 +230,17 @@ LoopHeight(Edge) {
     f := info[2]
     max := info[3]
 
-    ; Only change height
-    serials := [ 0.75, 0.5, 0.25 ]
-
-    ; Calculate current height ratio
+    serials := [0.75, 0.5, 0.25]
     current := f.h / max.h
 
-    ; Find next serial
     nextSerial := serials[1]
     for i, r in serials {
-        if (abs(current - r) < 0.01) {
-            nextSerial := serials[i + 1]
-            if (!nextSerial)
-                nextSerial := serials[1]
+        if (Abs(current - r) < 0.01) {
+            nextSerial := i = serials.Length ? serials[1] : serials[i + 1]
             break
         }
     }
 
-    ; Apply new height
     f.h := Floor(max.h * nextSerial)
 
     if InStr(Edge, "Top")
@@ -321,31 +257,24 @@ LoopFixedRatio(ratio) {
     f := info[2]
     max := info[3]
 
-    ; Fixed ratio window
     ScreenM := Min(max.w, max.h)
     BaseW := Floor(ScreenM * ratio)
     BaseH := ScreenM
-    serials := [ 1, 0.9, 0.7, 0.5 ]
+    serials := [1, 0.9, 0.7, 0.5]
 
-    ; Calculate current window relative to base size
     current := f.w / BaseW
 
-    ; Find next serial
     nextSerial := serials[1]
     for i, r in serials {
-        if (abs(current - r) < 0.01) {
-            nextSerial := serials[i + 1]
-            if (!nextSerial)
-                nextSerial := serials[1]
+        if (Abs(current - r) < 0.01) {
+            nextSerial := i = serials.Length ? serials[1] : serials[i + 1]
             break
         }
     }
 
-    ; Apply new size
     f.w := Floor(BaseW * nextSerial)
     f.h := Floor(BaseH * nextSerial)
 
-    ; centering
     f.x := max.x + (max.w - f.w) / 2
     f.y := max.y + (max.h - f.h) / 2
 
