@@ -26,9 +26,11 @@ end
 local function getDebugInfo()
     local win, f, max = getWindowFrame()
     if not win then return "No window focused" end
-    return string.format("Window: %d x %d @ (%d, %d)\nScreen: %d x %d @ (%d, %d)",
-        f.w, f.h, f.x, f.y,
-        max.w, max.h, max.x, max.y)
+
+    return string.format("Window ID: %s\nWindow Frame: [%d, %d, %d, %d]\nScreen Frame: [%d, %d, %d, %d]",
+        win:id(),
+        f.x, f.y, f.w, f.h,
+        max.x, max.y, max.w, max.h)
 end
 
 local function moveToCenter()
@@ -40,53 +42,117 @@ local function moveToCenter()
     setWindowFrame(win, f)
 end
 
-local function cycleRatios(f, max, ratios, isWidth, alignRight)
-    local size = isWidth and f.w or f.h
-    local maxSize = isWidth and max.w or max.h
+local function moveToEdge(edge)
+    local win, f, max = getWindowFrame()
+    if not win then return end
 
-    for i, ratio in ipairs(ratios) do
-        if size == math.floor(maxSize * ratio) then
-            local nextRatio = ratios[i + 1] or ratios[1]
-            if isWidth then
-                f.w = math.floor(maxSize * nextRatio)
-                f.x = alignRight and (max.x + math.floor(max.w * (1 - nextRatio))) or max.x
-            else
-                f.h = math.floor(maxSize * nextRatio)
-                f.y = alignRight and (max.y + (max.h - f.h)) or max.y
-            end
-            return true
-        end
+    if edge == "Left" then
+        f.x = max.x
+    elseif edge == "Right" then
+        f.x = max.x + (max.w - f.w)
+    elseif edge == "Top" then
+        f.y = max.y
+    elseif edge == "Bottom" then
+        f.y = max.y + (max.h - f.h)
     end
 
-    if isWidth then
-        f.w = math.floor(maxSize * ratios[1])
-        f.x = alignRight and (max.x + math.floor(max.w * (1 - ratios[1]))) or max.x
-    else
-        f.h = math.floor(maxSize * ratios[1])
-        f.y = alignRight and (max.y + (max.h - f.h)) or max.y
-    end
-    return true
+    setWindowFrame(win, f)
 end
 
-local function cycleFixedRatioWindow(f, max, ratio)
-    local basew = math.floor(max.h * ratio)
-    local baseh = max.h
+local function toHalfScreen(edge)
+    local win, f, max = getWindowFrame()
+    if not win then return end
 
-    f.x = max.x
-    f.y = max.y
+    if edge == "Left" then
+        f.w = math.floor(max.w / 2)
+        f.h = max.h
+        f.x = max.x
+        f.y = max.y
+    elseif edge == "Right" then
+        f.w = math.floor(max.w / 2)
+        f.h = max.h
+        f.x = max.x + (max.w - f.w)
+        f.y = max.y
+    elseif edge == "Top" then
+        f.w = max.w
+        f.h = math.floor(max.h / 2)
+        f.x = max.x
+        f.y = max.y
+    elseif edge == "Bottom" then
+        f.w = max.w
+        f.h = math.floor(max.h / 2)
+        f.x = max.x
+        f.y = max.y + (max.h - f.h)
+    end
 
-    for i, ratio in ipairs(BASE_RATIOS) do
-        if f.w == math.floor(basew * ratio) then
-            local nextRatio = BASE_RATIOS[i + 1] or BASE_RATIOS[1]
-            f.w = math.floor(basew * nextRatio)
-            f.h = math.floor(baseh * nextRatio)
-            return true
+    setWindowFrame(win, f)
+end
+
+local function loopWidth(edge)
+    local win, f, max = getWindowFrame()
+    if not win then return end
+
+    local current = f.w / max.w
+    local nextRatio = WIDTH_RATIOS[1]
+
+    for i, ratio in ipairs(WIDTH_RATIOS) do
+        if math.abs(current - ratio) < 0.01 then
+            nextRatio = WIDTH_RATIOS[i + 1] or WIDTH_RATIOS[1]
+            break
         end
     end
 
-    f.w = math.floor(basew * BASE_RATIOS[1])
-    f.h = math.floor(baseh * BASE_RATIOS[1])
-    return true
+    f.w = math.floor(max.w * nextRatio)
+    f.x = edge == "Right" and (max.x + (max.w - f.w)) or max.x
+
+    setWindowFrame(win, f)
+end
+
+local function loopHeight(edge)
+    local win, f, max = getWindowFrame()
+    if not win then return end
+
+    local current = f.h / max.h
+    local nextRatio = HEIGHT_RATIOS[1]
+
+    for i, ratio in ipairs(HEIGHT_RATIOS) do
+        if math.abs(current - ratio) < 0.01 then
+            nextRatio = HEIGHT_RATIOS[i + 1] or HEIGHT_RATIOS[1]
+            break
+        end
+    end
+
+    f.h = math.floor(max.h * nextRatio)
+    f.y = edge == "Bottom" and (max.y + (max.h - f.h)) or max.y
+
+    setWindowFrame(win, f)
+end
+
+local function loopFixedRatio(ratio)
+    local win, f, max = getWindowFrame()
+    if not win then return end
+
+    local screenM = math.min(max.w, max.h)
+    local baseW = math.floor(screenM * ratio)
+    local baseH = screenM
+    
+    local current = f.w / baseW
+    local nextRatio = BASE_RATIOS[1]
+
+    for i, r in ipairs(BASE_RATIOS) do
+        if math.abs(current - r) < 0.01 then
+            nextRatio = BASE_RATIOS[i + 1] or BASE_RATIOS[1]
+            break
+        end
+    end
+
+    f.w = math.floor(baseW * nextRatio)
+    f.h = math.floor(baseH * nextRatio)
+
+    f.x = max.x + (max.w - f.w) / 2
+    f.y = max.y + (max.h - f.h) / 2
+
+    setWindowFrame(win, f)
 end
 
 -- ------
@@ -109,41 +175,10 @@ hs.hotkey.bind(hyper, "C", moveToCenter)
 -- ------
 -- Move to edges
 -- ------
-hs.hotkey.bind(hyper, "Home", function()
-    local win, f, max = getWindowFrame()
-    if not win then return end
-
-    f.x = max.x
-    f.y = f.y
-    setWindowFrame(win, f)
-end)
-
-hs.hotkey.bind(hyper, "End", function()
-    local win, f, max = getWindowFrame()
-    if not win then return end
-
-    f.x = max.x + (max.w - f.w)
-    f.y = f.y
-    setWindowFrame(win, f)
-end)
-
-hs.hotkey.bind(hyper, "PageUp", function()
-    local win, f, max = getWindowFrame()
-    if not win then return end
-
-    f.x = f.x
-    f.y = max.y
-    setWindowFrame(win, f)
-end)
-
-hs.hotkey.bind(hyper, "PageDown", function()
-    local win, f, max = getWindowFrame()
-    if not win then return end
-
-    f.x = f.x
-    f.y = max.y + (max.h - f.h)
-    setWindowFrame(win, f)
-end)
+hs.hotkey.bind(hyper, "Home", function() moveToEdge("Left") end)
+hs.hotkey.bind(hyper, "End", function() moveToEdge("Right") end)
+hs.hotkey.bind(hyper, "PageUp", function() moveToEdge("Top") end)
+hs.hotkey.bind(hyper, "PageDown", function() moveToEdge("Bottom") end)
 
 -- ------
 -- Move to another screen
@@ -161,84 +196,18 @@ end)
 -- ------
 -- Half screen
 -- ------
--- vertical
-hs.hotkey.bind(hyperShift, "Left", function()
-    local win, f, max = getWindowFrame()
-    if not win then return end
-
-    f.x = max.x
-    f.y = max.y
-    f.w = max.w / 2
-    f.h = max.h
-    setWindowFrame(win, f)
-end)
-
-hs.hotkey.bind(hyperShift, "Right", function()
-    local win, f, max = getWindowFrame()
-    if not win then return end
-
-    f.x = max.x + (max.w / 2)
-    f.y = max.y
-    f.w = max.w / 2
-    f.h = max.h
-    setWindowFrame(win, f)
-end)
-
--- horizonal
-hs.hotkey.bind(hyperShift, "Up", function()
-    local win, f, max = getWindowFrame()
-    if not win then return end
-
-    f.x = max.x
-    f.y = max.y
-    f.w = max.w
-    f.h = max.h / 2
-    setWindowFrame(win, f)
-end)
-
-hs.hotkey.bind(hyperShift, "Down", function()
-    local win, f, max = getWindowFrame()
-    if not win then return end
-
-    f.x = max.x
-    f.y = max.y + (max.h - f.h)
-    f.w = max.w
-    f.h = max.h / 2
-    setWindowFrame(win, f)
-end)
+hs.hotkey.bind(hyperShift, "Left", function() toHalfScreen("Left") end)
+hs.hotkey.bind(hyperShift, "Right", function() toHalfScreen("Right") end)
+hs.hotkey.bind(hyperShift, "Up", function() toHalfScreen("Top") end)
+hs.hotkey.bind(hyperShift, "Down", function() toHalfScreen("Bottom") end)
 
 -- ------
 -- Loops
 -- ------
--- loop width ratios
-hs.hotkey.bind(hyper, "Left", function()
-    local win, f, max = getWindowFrame()
-    if not win then return end
-    cycleRatios(f, max, WIDTH_RATIOS, true, false)
-    setWindowFrame(win, f)
-end)
-
-hs.hotkey.bind(hyper, "Right", function()
-    local win, f, max = getWindowFrame()
-    if not win then return end
-    cycleRatios(f, max, WIDTH_RATIOS, true, true)
-    setWindowFrame(win, f)
-end)
-
--- loop height ratios
-hs.hotkey.bind(hyper, "Up", function()
-    local win, f, max = getWindowFrame()
-    if not win then return end
-    cycleRatios(f, max, HEIGHT_RATIOS, false, false)
-    setWindowFrame(win, f)
-end)
-
-hs.hotkey.bind(hyper, "Down", function()
-    local win, f, max = getWindowFrame()
-    if not win then return end
-    cycleRatios(f, max, HEIGHT_RATIOS, false, true)
-    setWindowFrame(win, f)
-end)
+hs.hotkey.bind(hyper, "Left", function() loopWidth("Left") end)
+hs.hotkey.bind(hyper, "Right", function() loopWidth("Right") end)
+hs.hotkey.bind(hyper, "Up", function() loopHeight("Top") end)
+hs.hotkey.bind(hyper, "Down", function() loopHeight("Bottom") end)
 
 -- ------
 -- Maximize window
@@ -246,13 +215,9 @@ end)
 hs.hotkey.bind(hyperShift, "M", function()
     local win, f, max = getWindowFrame()
     if not win then return end
-    cycleFixedRatioWindow(f, max, max.w/max.h)
-    setWindowFrame(win, f)
+    loopFixedRatio(max.w/max.h)
 end)
 
 hs.hotkey.bind(hyper, "M", function()
-    local win, f, max = getWindowFrame()
-    if not win then return end
-    cycleFixedRatioWindow(f, max, 4/3)
-    setWindowFrame(win, f)
+    loopFixedRatio(4/3)
 end)
