@@ -116,7 +116,7 @@ return
 return
 
 #!^M::
-    LoopFixedRatio()
+    LoopFixedRatio(4/3)
 return
 
 ; ----------------------------
@@ -321,41 +321,41 @@ LoopHeight(Edge) {
     SetWindowFrame2(win, f)
 }
 
-LoopFixedRatio() {
-    MonNum := GetMonitorNumber()
+LoopFixedRatio(ratio) {
+    info := GetWindowFrame()
+    win := info[1]
+    f := info[2]
+    max := info[3]
 
-    ; Set the screen variables
-    SysGet, Mon, MonitorWorkArea, %MonNum%
-    ScreenW := MonRight - MonLeft
-    ScreenH := MonBottom - MonTop
-
-    ; "A" to get the active window's pos
-    WinGetPos, WinX, WinY, WinW, WinH, A
-
-    ; 4:3 window
-    ScreenM := Min(ScreenW, ScreenH)
-    BaseW := Floor(ScreenM * 4 / 3)
+    ; Fixed ratio window
+    ScreenM := Min(max.w, max.h)
+    BaseW := Floor(ScreenM * ratio)
     BaseH := ScreenM
     serials := [ 1, 0.9, 0.7, 0.5 ]
 
-    if ( WinW = Floor(BaseW * serials[1]) ) {
-        NewW := Floor(BaseW * serials[2])
-        NewH := Floor(BaseH * serials[2])
-    } else if ( WinW = Floor(BaseW * serials[2]) ) {
-        NewW := Floor(BaseW * serials[3])
-        NewH := Floor(BaseH * serials[3])
-    } else if ( WinW = Floor(BaseW * serials[3]) ) {
-        NewW := Floor(BaseW * serials[4])
-        NewH := Floor(BaseH * serials[4])
-    } else if ( WinW = Floor(BaseW * serials[4]) ) {
-        NewW := Floor(BaseW * serials[1])
-        NewH := Floor(BaseH * serials[1])
-    } else {
-        NewW := Floor(BaseW * serials[1])
-        NewH := Floor(BaseH * serials[1])
+    ; Calculate current window relative to base size
+    current := f.w / BaseW
+
+    ; Find next serial
+    nextSerial := serials[1]
+    for i, r in serials {
+        if (abs(current - r) < 0.01) {
+            nextSerial := serials[i + 1]
+            if (!nextSerial)
+                nextSerial := serials[1]
+            break
+        }
     }
 
-    ResizeAndCenterWindow(MonNum, NewW, NewH)
+    ; Apply new size
+    f.w := Floor(BaseW * nextSerial)
+    f.h := Floor(BaseH * nextSerial)
+
+    ; centering
+    f.x := max.x + (max.w - f.w) / 2
+    f.y := max.y + (max.h - f.h) / 2
+
+    SetWindowFrame2(win, f)
 }
 
 CalculateSizeByWinRatio(ByRef NewW, ByRef NewH, MonNum, Ratio) {
