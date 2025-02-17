@@ -33,16 +33,7 @@ InitializeIcon() {
 
 ; Hello world
 #!^W::
-    info := GetWindowFrame()
-    win := info[1]
-    f := info[2]
-    max := info[3]
-    MonNum := GetMonitorNumber()
-    msg := "Monitor: " . MonNum
-        . "`nWindow ID: " . win
-        . "`nWindow Frame: [" . f.x . ", " . f.y . ", " . f.w . ", " . f.h . "]"
-        . "`nScreen Frame: [" . max.x . ", " . max.y . ", " . max.w . ", " . max.h . "]"
-    MsgBox % msg
+    MsgBox % GetDebugInfo()
 return
 
 #!^+W::
@@ -161,6 +152,18 @@ GetWindowFrame() {
            , h: MonBottom - MonTop }
 
     return [win, f, max]
+}
+
+GetDebugInfo() {
+    info := GetWindowFrame()
+    win := info[1]
+    f := info[2]
+    max := info[3]
+    MonNum := GetMonitorNumber()
+    return "Monitor: " . MonNum
+        . "`nWindow ID: " . win
+        . "`nWindow Frame: [" . f.x . ", " . f.y . ", " . f.w . ", " . f.h . "]"
+        . "`nScreen Frame: [" . max.x . ", " . max.y . ", " . max.w . ", " . max.h . "]"
 }
 
 EnsureWindowIsRestored() {
