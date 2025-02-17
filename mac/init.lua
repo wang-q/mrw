@@ -8,12 +8,92 @@ local HEIGHT_RATIOS = { 0.75, 0.5, 0.25 }
 local BASE_RATIOS = { 1.0, 0.9, 0.7, 0.5 }
 
 -- ------
+-- window management utilities
+-- ------
+local function getWindowFrame()
+    local win = hs.window.focusedWindow()
+    if not win then return nil end
+    return win, win:frame(), win:screen():frame()
+end
+
+local function setWindowFrame(win, f)
+    if win then win:setFrame(f) end
+end
+
+-- ------
+-- Key binding implementations
+-- ------
+local function getDebugInfo()
+    local win, f, max = getWindowFrame()
+    if not win then return "No window focused" end
+    return string.format("Window: %d x %d @ (%d, %d)\nScreen: %d x %d @ (%d, %d)",
+        f.w, f.h, f.x, f.y,
+        max.w, max.h, max.x, max.y)
+end
+
+local function moveToCenter()
+    local win, f, max = getWindowFrame()
+    if not win then return end
+
+    f.x = max.x + (max.w - f.w) / 2
+    f.y = max.y + (max.h - f.h) / 2
+    setWindowFrame(win, f)
+end
+
+local function cycleRatios(f, max, ratios, isWidth, alignRight)
+    local size = isWidth and f.w or f.h
+    local maxSize = isWidth and max.w or max.h
+
+    for i, ratio in ipairs(ratios) do
+        if size == math.floor(maxSize * ratio) then
+            local nextRatio = ratios[i + 1] or ratios[1]
+            if isWidth then
+                f.w = math.floor(maxSize * nextRatio)
+                f.x = alignRight and (max.x + math.floor(max.w * (1 - nextRatio))) or max.x
+            else
+                f.h = math.floor(maxSize * nextRatio)
+                f.y = alignRight and (max.y + (max.h - f.h)) or max.y
+            end
+            return true
+        end
+    end
+
+    if isWidth then
+        f.w = math.floor(maxSize * ratios[1])
+        f.x = alignRight and (max.x + math.floor(max.w * (1 - ratios[1]))) or max.x
+    else
+        f.h = math.floor(maxSize * ratios[1])
+        f.y = alignRight and (max.y + (max.h - f.h)) or max.y
+    end
+    return true
+end
+
+local function cycleFixedRatioWindow(f, max, ratio)
+    local basew = math.floor(max.h * ratio)
+    local baseh = max.h
+
+    f.x = max.x
+    f.y = max.y
+
+    for i, ratio in ipairs(BASE_RATIOS) do
+        if f.w == math.floor(basew * ratio) then
+            local nextRatio = BASE_RATIOS[i + 1] or BASE_RATIOS[1]
+            f.w = math.floor(basew * nextRatio)
+            f.h = math.floor(baseh * nextRatio)
+            return true
+        end
+    end
+
+    f.w = math.floor(basew * BASE_RATIOS[1])
+    f.h = math.floor(baseh * BASE_RATIOS[1])
+    return true
+end
+
+-- ------
 -- hello world
 -- ------
 hs.hotkey.bind(hyper, "W", function()
-    local win, f, max = getWindowFrame()
-    if not win then return end
-    hs.alert.show(string.format("Valid screen size: %d x %d", max.w, max.h))
+    hs.alert.show(getDebugInfo())
 end)
 
 hs.hotkey.bind(hyperShift, "W", function()
@@ -24,14 +104,7 @@ end)
 -- ------
 -- Center window
 -- ------
-hs.hotkey.bind(hyper, "C", function()
-    local win, f, max = getWindowFrame()
-    if not win then return end
-
-    f.x = max.x + (max.w - f.w) / 2
-    f.y = max.y + (max.h - f.h) / 2
-    setWindowFrame(win, f)
-end)
+hs.hotkey.bind(hyper, "C", moveToCenter)
 
 -- ------
 -- Move to edges
@@ -183,65 +256,3 @@ hs.hotkey.bind(hyper, "M", function()
     cycleFixedRatioWindow(f, max, 4/3)
     setWindowFrame(win, f)
 end)
-
--- ------
--- window management utilities
--- ------
-local function getWindowFrame()
-    local win = hs.window.focusedWindow()
-    if not win then return nil end
-    return win, win:frame(), win:screen():frame()
-end
-
-local function setWindowFrame(win, f)
-    if win then win:setFrame(f) end
-end
-
-local function cycleRatios(f, max, ratios, isWidth, alignRight)
-    local size = isWidth and f.w or f.h
-    local maxSize = isWidth and max.w or max.h
-
-    for i, ratio in ipairs(ratios) do
-        if size == math.floor(maxSize * ratio) then
-            local nextRatio = ratios[i + 1] or ratios[1]
-            if isWidth then
-                f.w = math.floor(maxSize * nextRatio)
-                f.x = alignRight and (max.x + math.floor(max.w * (1 - nextRatio))) or max.x
-            else
-                f.h = math.floor(maxSize * nextRatio)
-                f.y = alignRight and (max.y + (max.h - f.h)) or max.y
-            end
-            return true
-        end
-    end
-
-    if isWidth then
-        f.w = math.floor(maxSize * ratios[1])
-        f.x = alignRight and (max.x + math.floor(max.w * (1 - ratios[1]))) or max.x
-    else
-        f.h = math.floor(maxSize * ratios[1])
-        f.y = alignRight and (max.y + (max.h - f.h)) or max.y
-    end
-    return true
-end
-
-local function cycleFixedRatioWindow(f, max, ratio)
-    local basew = math.floor(max.h * ratio)
-    local baseh = max.h
-
-    f.x = max.x
-    f.y = max.y
-
-    for i, ratio in ipairs(BASE_RATIOS) do
-        if f.w == math.floor(basew * ratio) then
-            local nextRatio = BASE_RATIOS[i + 1] or BASE_RATIOS[1]
-            f.w = math.floor(basew * nextRatio)
-            f.h = math.floor(baseh * nextRatio)
-            return true
-        end
-    end
-
-    f.w = math.floor(basew * BASE_RATIOS[1])
-    f.h = math.floor(baseh * BASE_RATIOS[1])
-    return true
-end
