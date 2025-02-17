@@ -51,11 +51,11 @@ return
 
 ; Center window
 #!^+C::
-    MoveWindowToCenter()
+    MoveToCenter()
 return
 
 #!^C::
-    MoveWindowToCenter()
+    MoveToCenter()
 return
 
 ; Move
@@ -173,6 +173,61 @@ SetWindowFrame(A, NewX, NewY, NewW, NewH) {
     WinMove, A, , NewX, NewY, NewW, NewH
 }
 
+SetWindowFrame2(win, f) {
+    if (win) {
+        EnsureWindowIsRestored()
+        WinMove, A, , f.x, f.y, f.w, f.h
+    }
+}
+
+GetCenterCoordinates(ByRef A, MonNum, ByRef NewX, ByRef NewY, WinW, WinH) {
+    ; Set the screen variables
+    SysGet, Mon, MonitorWorkArea, %MonNum%
+    ScreenW := MonRight - MonLeft
+    ScreenH := MonBottom - MonTop
+
+    ; Calculate the position based on the given dimensions [W|H]
+    NewX := (ScreenW-WinW)/2 + MonLeft ; Adjust for monitor offset
+    NewY := (ScreenH-WinH)/2 + MonTop ; Adjust for monitor offset
+}
+
+ResizeAndCenterWindow(MonNum, NewW, NewH) {
+    GetCenterCoordinates(A, MonNum, NewX, NewY, NewW, NewH)
+    SetWindowFrame(A, NewX, NewY, NewW, NewH)
+}
+
+MoveToCenter() {
+    info := GetWindowFrame()
+    win := info[1]
+    f := info[2]
+    max := info[3]
+
+    ; Calculate center position directly
+    f.x := max.x + (max.w - f.w) / 2
+    f.y := max.y + (max.h - f.h) / 2
+
+    SetWindowFrame2(win, f)
+}
+
+MoveToEdge(Edge) {
+    info := GetWindowFrame()
+    win := info[1]
+    f := info[2]
+    max := info[3]
+
+    ; Set window coordinates
+    if InStr(Edge, "Left")
+        f.x := max.x
+    if InStr(Edge, "Right")
+        f.x := max.x + (max.w - f.w)
+    if InStr(Edge, "Top")
+        f.y := max.y
+    if InStr(Edge, "Bottom")
+        f.y := max.y + (max.h - f.h)
+
+    SetWindowFrame2(win, f)
+}
+
 ToHalfScreen(Edge) {
     MonNum := GetMonitorNumber()
 
@@ -278,22 +333,6 @@ LoopHeight(Edge) {
     SetWindowFrame(A, NewX, NewY, NewW, NewH)
 }
 
-GetCenterCoordinates(ByRef A, MonNum, ByRef NewX, ByRef NewY, WinW, WinH) {
-    ; Set the screen variables
-    SysGet, Mon, MonitorWorkArea, %MonNum%
-    ScreenW := MonRight - MonLeft
-    ScreenH := MonBottom - MonTop
-
-    ; Calculate the position based on the given dimensions [W|H]
-    NewX := (ScreenW-WinW)/2 + MonLeft ; Adjust for monitor offset
-    NewY := (ScreenH-WinH)/2 + MonTop ; Adjust for monitor offset
-}
-
-ResizeAndCenterWindow(MonNum, NewW, NewH) {
-    GetCenterCoordinates(A, MonNum, NewX, NewY, NewW, NewH)
-    SetWindowFrame(A, NewX, NewY, NewW, NewH)
-}
-
 LoopFixedRatio() {
     MonNum := GetMonitorNumber()
 
@@ -329,34 +368,6 @@ LoopFixedRatio() {
     }
 
     ResizeAndCenterWindow(MonNum, NewW, NewH)
-}
-
-MoveWindowToCenter() {
-    WinGetPos, WinX, WinY, WinW, WinH, A  ; "A" to get the active window's pos.
-    MonNum := GetMonitorNumber()
-    ResizeAndCenterWindow(MonNum, WinW, WinH)
-    return
-}
-
-MoveToEdge(Edge) {
-    ; Get monitor and window dimensions
-    MonNum := GetMonitorNumber()
-    SysGet, Mon, MonitorWorkArea, %MonNum%
-    WinGetPos, WinX, WinY, WinW, WinH, A  ; "A" to get the active window's pos.
-
-    ; Set window coordinates
-    if InStr(Edge, "Left")
-        NewX := MonLeft
-    if InStr(Edge, "Right")
-        NewX := MonRight - WinW
-    if InStr(Edge, "Top")
-        NewY := MonTop
-    if InStr(Edge, "Bottom")
-        NewY := MonBottom - WinH
-
-    ; MsgBox NewX/NewY = %NewX%,%NewY%
-    SetWindowFrame(A, NewX, NewY, NewW, NewH)
-    return
 }
 
 CalculateSizeByWinRatio(ByRef NewW, ByRef NewH, MonNum, Ratio) {
