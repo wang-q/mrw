@@ -8,23 +8,32 @@
 |                       | <kbd>ctrl</kbd> +<kbd>win</kbd> + <kbd>alt</kbd> |
 | <kbd>hyperShift</kbd> |       <kbd>hyper</kbd> + <kbd>shift</kbd>        |
 
+### Basic Operations
+
 * Center current window. <kbd>hyper</kbd> + <kbd>C</kbd>
+* Maximize current window. <kbd>hyperShift</kbd> + <kbd>M</kbd>
+* Move current window to another monitor. <kbd>hyper</kbd> + <kbd>J</kbd> or <kbd>K</kbd>
+
+### Edge Operations
+
 * Move to edges
     * Left - <kbd>hyper</kbd> + <kbd>Home</kbd>
     * Right - <kbd>hyper</kbd> + <kbd>End</kbd>
     * Top - <kbd>hyper</kbd> + <kbd>PgUp</kbd>
-    * Down - <kbd>hyper</kbd> + <kbd>PgDn</kbd>
-* Base size is 1.33x1 screen height (4:3 window). Loop through 1, 0.9, 0.7, 0.5 and 0.3. <kbd>
-  hyper</kbd> + <kbd>M</kbd>
-* Maximize current window. <kbd>hyperShift</kbd> + <kbd>M</kbd>
-* Vertical half screen size. <kbd>hyperShift</kbd> + <kbd>Left</kbd> or <kbd>Right</kbd>
-* Horizontal half screen size. <kbd>hyperShift</kbd> + <kbd>Up</kbd> or <kbd>Down</kbd>
-* Loop through 3/4, 3/5, 1/2, 2/5, 1/4 screen width. <kbd>hyper</kbd> + <kbd>Left</kbd> or <kbd>
-  Right</kbd>
-* Loop through 3/4, 1/2 and 1/4 screen height. <kbd>hyper</kbd> +<kbd>Up</kbd> or <kbd>Down</kbd>
-* Move current window to another monitor. <kbd>hyper</kbd> + <kbd>J</kbd> or <kbd>K</kbd>
+    * Bottom - <kbd>hyper</kbd> + <kbd>PgDn</kbd>
 
-For testing:
+### Size Operations
+
+* Base size (4:3 window)
+    * Loop through screen height ratios: 1.0, 0.9, 0.7, 0.5, 0.3. <kbd>hyper</kbd> + <kbd>M</kbd>
+* Width adjustments
+    * Loop through screen width ratios: 3/4, 3/5, 1/2, 2/5, 1/4. <kbd>hyper</kbd> + <kbd>Left</kbd> or <kbd>Right</kbd>
+    * Set to vertical half screen. <kbd>hyperShift</kbd> + <kbd>Left</kbd> or <kbd>Right</kbd>
+* Height adjustments
+    * Loop through screen height ratios: 3/4, 1/2, 1/4. <kbd>hyper</kbd> + <kbd>Up</kbd> or <kbd>Down</kbd>
+    * Set to horizontal half screen. <kbd>hyperShift</kbd> + <kbd>Up</kbd> or <kbd>Down</kbd>
+
+### Testing
 
 * Alert. <kbd>hyper</kbd> + <kbd>W</kbd>
 * Notify. <kbd>hyperShift</kbd> + <kbd>W</kbd>
