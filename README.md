@@ -1,6 +1,8 @@
-# Resize windows on macOS/Windows
+# Mr. W - Move and resize windows on macOS/Windows
 
 ## Usage
+
+> Note: Hotkey combinations differ slightly between macOS and Windows, but functionality remains consistent.
 
 |        Symbol         |                       Key                     |
 |:---------------------:|:---------------------------------------------:|
@@ -36,8 +38,8 @@
 
 ### Testing
 
-* Alert. <kbd>hyper</kbd>+<kbd>W</kbd>
-* Notify. <kbd>hyperShift</kbd>+<kbd>W</kbd>
+* Show window info. <kbd>hyper</kbd>+<kbd>W</kbd>
+* Show notification. <kbd>hyperShift</kbd>+<kbd>W</kbd>
 
 ## macOS - Hammerspoon
 
@@ -59,16 +61,15 @@ If you want the program to start automatically at startup, run the following cod
 
 ```powershell
 $WshShell = New-Object -comObject WScript.Shell
-$Shortcut = $WshShell.CreateShortcut("$ENV:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\rw.lnk")
-$Shortcut.TargetPath = "$Home\Scripts\rw\win\init.ahk"
+$Shortcut = $WshShell.CreateShortcut("$ENV:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\mrw.lnk")
+$Shortcut.TargetPath = "$Home\Scripts\mrw\win\init.ahk"
 $Shortcut.Save()
 
 # start "$ENV:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup"
 
 ```
 
-[officekey](https://superuser.com/questions/1455857/how-to-disable-office-key-keyboard-shortcut-opening-office-app)
-[ahk forum](https://www.autohotkey.com/boards/viewtopic.php?t=65573)
+Optional: Disable Office key shortcuts (see [superuser](https://superuser.com/questions/1455857/how-to-disable-office-key-keyboard-shortcut-opening-office-app) and [ahk forum](https://www.autohotkey.com/boards/viewtopic.php?t=65573)):
 
 ```cmd
 REG ADD HKCU\Software\Classes\ms-officeapp\Shell\Open\Command /t REG_SZ /d rundll32
@@ -79,9 +80,10 @@ REG ADD HKCU\Software\Classes\ms-officeapp\Shell\Open\Command /t REG_SZ /d rundl
 
 ## Ideas
 
-Hammerspoon section comes
-from [this post](http://songchenwen.com/tech/2015/04/02/hammerspoon-mac-window-manager/).
+This project is inspired by:
 
-Size looping like [spectacle](https://www.spectacleapp.com).
+* Size looping behavior from [spectacle](https://www.spectacleapp.com).
 
-AHK section comes from [here](https://github.com/justcla/WindowHotKeys).
+* Hammerspoon implementation reference from [this post](http://songchenwen.com/tech/2015/04/02/hammerspoon-mac-window-manager/).
+
+* AutoHotkey implementation reference from [here](https://github.com/justcla/WindowHotKeys).
