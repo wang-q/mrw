@@ -28,7 +28,7 @@ InitializeIcon() {
 GetMonitorNumber() {
     WinGetPos &WinX, &WinY,,, "A"  ; "A" to get the active window's pos.
     monitorCount := MonitorGetCount()
-    
+
     Loop monitorCount {
         MonitorGet(A_Index, &Left, &Top, &Right, &Bottom)
         if (Left <= WinX && WinX < Right && Top <= WinY && WinY <= Bottom)
@@ -67,7 +67,7 @@ GetDebugInfo() {
     f := info[2]
     max := info[3]
     MonNum := GetMonitorNumber()
-    
+
     return Format(
         "Monitor: {}`nWindow ID: {}`nWindow Frame: [{}, {}, {}, {}]`nScreen Frame: [{}, {}, {}, {}]",
         MonNum, win, f.x, f.y, f.w, f.h, max.x, max.y, max.w, max.h
@@ -245,11 +245,17 @@ LoopFixedRatio(ratio) {
 ; Center window
 #!^+c:: MoveToCenter()
 #!^c:: MoveToCenter()
+#!^+Del:: MoveToCenter()
+#!^Del:: MoveToCenter()
 
 ; Move to edges
+#!^+Home:: MoveToEdge("Left")
 #!^Home:: MoveToEdge("Left")
+#!^+End:: MoveToEdge("Right")
 #!^End:: MoveToEdge("Right")
+#!^+PgUp:: MoveToEdge("Top")
 #!^PgUp:: MoveToEdge("Top")
+#!^+PgDn:: MoveToEdge("Bottom")
 #!^PgDn:: MoveToEdge("Bottom")
 
 ; Half screen
@@ -272,5 +278,11 @@ LoopFixedRatio(ratio) {
     max := info[3]
     LoopFixedRatio(max.w / max.h)
 }
+#!^+Enter:: {
+    info := GetWindowFrame()
+    max := info[3]
+    LoopFixedRatio(max.w / max.h)
+}
 
 #!^m:: LoopFixedRatio(4/3)
+#!^Enter:: LoopFixedRatio(4/3)
