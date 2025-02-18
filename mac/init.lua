@@ -170,12 +170,21 @@ end)
 
 -- Center window
 hs.hotkey.bind(hyper, "C", moveToCenter)
+hs.hotkey.bind(hyperShift, "C", moveToCenter)
+hs.hotkey.bind(hyper, "delete", moveToCenter)
+hs.hotkey.bind(hyperShift, "delete", moveToCenter)
+hs.hotkey.bind(hyper, "forwarddelete", moveToCenter)
+hs.hotkey.bind(hyperShift, "forwarddelete", moveToCenter)
 
 -- Move to edges
 hs.hotkey.bind(hyper, "Home", function() moveToEdge("Left") end)
+hs.hotkey.bind(hyperShift, "Home", function() moveToEdge("Left") end)
 hs.hotkey.bind(hyper, "End", function() moveToEdge("Right") end)
+hs.hotkey.bind(hyperShift, "End", function() moveToEdge("Right") end)
 hs.hotkey.bind(hyper, "PageUp", function() moveToEdge("Top") end)
+hs.hotkey.bind(hyperShift, "PageUp", function() moveToEdge("Top") end)
 hs.hotkey.bind(hyper, "PageDown", function() moveToEdge("Bottom") end)
+hs.hotkey.bind(hyperShift, "PageDown", function() moveToEdge("Bottom") end)
 
 -- Move to another screen
 hs.hotkey.bind(hyper, "J", function()
@@ -210,5 +219,8 @@ hs.hotkey.bind(hyperShift, "M", function()
 end)
 
 hs.hotkey.bind(hyper, "M", function()
+    loopFixedRatio(4/3)
+end)
+hs.hotkey.bind(hyper, "Return", function()
     loopFixedRatio(4/3)
 end)
