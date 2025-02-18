@@ -54,17 +54,14 @@ bash mac/install.sh
 
 ## Windows - AutoHotkey v2
 
-[Download here](https://www.autohotkey.com/) or
-`winget install --id AutoHotkey.AutoHotkey`.
+[Download here](https://www.autohotkey.com/) or `winget install --id AutoHotkey.AutoHotkey`.
 
 If you want the program to start automatically at startup, run the following codes:
 
 ```powershell
-$WshShell = New-Object -comObject WScript.Shell
-$Shortcut = $WshShell.CreateShortcut("$ENV:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\mrw.lnk")
-$Shortcut.TargetPath = "$Home\Scripts\mrw\win\init.ahk"
-$Shortcut.Save()
+powershell -ExecutionPolicy Bypass -File .\win\install.ps1
 
+# To remove:
 # start "$ENV:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup"
 
 ```
@@ -82,7 +79,7 @@ REG ADD HKCU\Software\Classes\ms-officeapp\Shell\Open\Command /t REG_SZ /d rundl
 
 This project is inspired by:
 
-* Size looping behavior from [spectacle](https://www.spectacleapp.com).
+* Size looping behavior from [spectacle](https://github.com/eczarny/spectacle).
 
 * Hammerspoon implementation reference from [this post](http://songchenwen.com/tech/2015/04/02/hammerspoon-mac-window-manager/).
 
