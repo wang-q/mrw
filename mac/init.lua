@@ -217,6 +217,11 @@ hs.hotkey.bind(hyperShift, "M", function()
     if not win then return end
     loopFixedRatio(max.w/max.h)
 end)
+hs.hotkey.bind(hyperShift, "Return", function()
+    local win, f, max = getWindowFrame()
+    if not win then return end
+    loopFixedRatio(max.w/max.h)
+end)
 
 hs.hotkey.bind(hyper, "M", function()
     loopFixedRatio(4/3)
