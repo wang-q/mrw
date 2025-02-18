@@ -28,6 +28,7 @@ InitializeIcon() {
 GetMonitorNumber() {
     WinGetPos &WinX, &WinY,,, "A"  ; "A" to get the active window's pos.
     monitorCount := MonitorGetCount()
+    
     Loop monitorCount {
         MonitorGet(A_Index, &Left, &Top, &Right, &Bottom)
         if (Left <= WinX && WinX < Right && Top <= WinY && WinY <= Bottom)
@@ -66,8 +67,11 @@ GetDebugInfo() {
     f := info[2]
     max := info[3]
     MonNum := GetMonitorNumber()
-    return Format("Monitor: {}`nWindow ID: {}`nWindow Frame: [{}, {}, {}, {}]`nScreen Frame: [{}, {}, {}, {}]",
-        MonNum, win, f.x, f.y, f.w, f.h, max.x, max.y, max.w, max.h)
+    
+    return Format(
+        "Monitor: {}`nWindow ID: {}`nWindow Frame: [{}, {}, {}, {}]`nScreen Frame: [{}, {}, {}, {}]",
+        MonNum, win, f.x, f.y, f.w, f.h, max.x, max.y, max.w, max.h
+    )
 }
 
 EnsureWindowIsRestored() {
