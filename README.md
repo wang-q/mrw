@@ -1,14 +1,23 @@
 # Mr. W - Move and resize windows on macOS/Windows
 
+- [Mr. W - Move and resize windows on macOS/Windows](#mr-w---move-and-resize-windows-on-macoswindows)
+  - [Usage](#usage)
+    - [Moving](#moving)
+    - [Resizing](#resizing)
+    - [Testing](#testing)
+  - [macOS - Hammerspoon](#macos---hammerspoon)
+  - [Windows - AutoHotkey v2](#windows---autohotkey-v2)
+  - [Ideas](#ideas)
+
 ## Usage
 
-> Note: Hotkey combinations differ slightly between macOS and Windows, but functionality remains consistent.
-
-|        Symbol         |                       Key                     |
-|:---------------------:|:---------------------------------------------:|
+|        Symbol         |                      Key                      |
+| :-------------------: | :-------------------------------------------: |
 |   <kbd>hyper</kbd>    | <kbd>ctrl</kbd>+<kbd>opt</kbd>+<kbd>cmd</kbd> |
 |                       | <kbd>ctrl</kbd>+<kbd>win</kbd>+<kbd>alt</kbd> |
 | <kbd>hyperShift</kbd> |       <kbd>hyper</kbd>+<kbd>shift</kbd>       |
+
+> Note: Hotkey combinations differ slightly between macOS and Windows, but functionality remains consistent.
 
 ### Moving
 
