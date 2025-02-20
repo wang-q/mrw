@@ -23,7 +23,7 @@
 
 ### Moving
 
-* Center current window. <kbd>hyper</kbd>+<kbd>C</kbd>/<kbd>Del</kbd>
+* Center current window. <kbd>hyper</kbd>+<kbd>C</kbd>/<kbd>Del</kbd>/<kbd>Forward Delete</kbd>
 
 * Move to edges
     * Left   - <kbd>hyper</kbd>+<kbd>Home</kbd>
@@ -36,8 +36,8 @@
 ### Resizing
 
 * Fixed ratio window
-    * Native ratio window (first maximize, then loop through ratios: 0.9, 0.7, 0.5). <kbd>hyperShift</kbd>+<kbd>M</kbd>/<kbd>Enter</kbd>
-    * 4:3 ratio window (loop through ratios: 1.0, 0.9, 0.7, 0.5). <kbd>hyper</kbd>+<kbd>M</kbd>/<kbd>Enter</kbd>
+    * Native ratio window (first maximize, then loop through ratios: 0.9, 0.7, 0.5). <kbd>hyperShift</kbd>+<kbd>M</kbd>/<kbd>Enter</kbd>/<kbd>Return</kbd>
+    * 4:3 ratio window (loop through ratios: 1.0, 0.9, 0.7, 0.5). <kbd>hyper</kbd>+<kbd>M</kbd>/<kbd>Enter</kbd>/<kbd>Return</kbd>
 
 * Width adjustments
     * Loop through screen width ratios: 3/4, 3/5, 1/2, 2/5, 1/4. <kbd>hyper</kbd>+<kbd>Left</kbd>/<kbd>Right</kbd>
