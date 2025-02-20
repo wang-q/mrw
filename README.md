@@ -19,6 +19,8 @@
 
 > Note: Hotkey combinations differ slightly between macOS and Windows, but functionality remains consistent.
 
+> Fun fact: Project named after the famous [Mitosis Rap: Mr. W's Cell Division Song](https://www.youtube.com/watch?v=pOsAbTi9tHw) 🧫 🔬 🧬
+
 ### Moving
 
 * Center current window. <kbd>hyper</kbd>+<kbd>C</kbd>/<kbd>Del</kbd>
