@@ -41,10 +41,6 @@ GetWindowFrame() {
     win := WinGetID("A")
 
     WinGetPos &WinX, &WinY, &WinW, &WinH, "A"
-
-    MonNum := GetMonitorNumber()
-    MonitorGetWorkArea(MonNum, &Left, &Top, &Right, &Bottom)
-
     f := {
         x: WinX,
         y: WinY,
