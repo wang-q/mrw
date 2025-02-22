@@ -39,11 +39,8 @@ GetMonitorNumber() {
 
 GetWindowFrame() {
     win := WinGetID("A")
+
     WinGetPos &WinX, &WinY, &WinW, &WinH, "A"
-
-    MonNum := GetMonitorNumber()
-    MonitorGet(MonNum, &Left, &Top, &Right, &Bottom)
-
     f := {
         x: WinX,
         y: WinY,
@@ -51,6 +48,8 @@ GetWindowFrame() {
         h: WinH
     }
 
+    MonNum := GetMonitorNumber()
+    MonitorGetWorkArea(MonNum, &Left, &Top, &Right, &Bottom)
     max := {
         x: Left,
         y: Top,
